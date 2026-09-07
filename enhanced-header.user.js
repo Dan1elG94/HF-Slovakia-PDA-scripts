@@ -2,8 +2,8 @@
 // @name         PDA - Enhanced Header
 // @namespace    http://tampermonkey.net/
 // @version      1.0.2
-// @updateURL    https://raw.githubusercontent.com/Dan1elG94/HF-Slovakia-PDA-scripts/main/enhanced-header.js
-// @downloadURL  https://raw.githubusercontent.com/Dan1elG94/HF-Slovakia-PDA-scripts/main/enhanced-header.js
+// @updateURL    https://github.com/Dan1elG94/HF-Slovakia-PDA-scripts/raw/refs/heads/main/enhanced-header.user.js
+// @downloadURL  https://github.com/Dan1elG94/HF-Slovakia-PDA-scripts/raw/refs/heads/main/enhanced-header.user.js
 // @description  Bigger name, added text to buton and highlighted logout button
 // @author       Gabris
 // @match        https://hf.simplifier.cloud/appDirect/PDA/
