@@ -27,6 +27,7 @@
 
   XMLHttpRequest.prototype.open = function (method, url, ...rest) {
     this._pda_url = url;
+    this._pda_method = method;
     return originalOpen.call(this, method, url, ...rest);
   };
 
