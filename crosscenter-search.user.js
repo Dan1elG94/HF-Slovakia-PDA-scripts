@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PDA - Cross-workcenter search (XHR data)
 // @namespace    http://tampermonkey.net/
-// @version      0.0.2
+// @version      0.0.3
 // @description  Searchbar na vyhladavanie naprieč vsetkymi pracoviskami
 // @author       Gabris
 // @updateURL    https://github.com/Dan1elG94/HF-Slovakia-PDA-scripts/raw/refs/heads/main/crosscenter-search.user.js
