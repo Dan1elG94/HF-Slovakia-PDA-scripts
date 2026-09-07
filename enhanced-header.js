@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PDA - Enhanced Header
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.0.1
 // @updateURL    https://github.com/Dan1elG94/HF-Slovakia-PDA-scripts/blob/main/enhanced-header.js
 // @downloadURL  https://github.com/Dan1elG94/HF-Slovakia-PDA-scripts/blob/main/enhanced-header.js
 // @description  Bigger name, added text to buton and highlighted logout button
@@ -17,7 +17,7 @@
   const USERNAME_SUFFIX = 'Label_Username-bdi';
   const USERNAME_FONT_SIZE = '1.8rem';
   const USERNAME_FONT_WEIGHT = 'bold';
-  const USERNAME_FONT_COLOR = '#000000';
+  const USERNAME_FONT_COLOR = '#ff0000';
   const BUTTON_TEXT_MARGIN_RIGHT = '0.6rem';
 
   const BUTTONS = [
