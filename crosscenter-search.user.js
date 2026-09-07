@@ -98,6 +98,7 @@
 
     let opening = false;
     let renderFn = null;
+    let lastAutoOpenedKey = null;
 
     function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
@@ -149,12 +150,18 @@
         return `${item.productionOrderNo} - ${item.operationNo} - ${item.sequenceNo}`;
     }
 
+    function formatProductionOrder(item) {
+        return `${item.productionOrderNo} - ${item.operationNo} - ${item.sequenceNo}`;
+    }
+
+    function getItemKey(item) {
+        return item.workcenter + '|' + item.productionOrderNo + '|' + item.operationNo + '|' + item.sequenceNo;
+    }
+
     function setStatus(msg) {
         const el = document.getElementById('__pda_status__');
         if (el) el.textContent = msg;
     }
-
-
 
     function getListIdForTile(tile) {
         if (!tile.id || !tile.id.startsWith(TILE_ID_PREFIX)) return null;
@@ -419,16 +426,29 @@
         }
 
         function render(filterText) {
-        resultsUl.innerHTML = '';
+            resultsUl.innerHTML = '';
             const term = filterText.trim().toLowerCase();
             const index = window.PDA_ORDERS_INDEX || [];
+            
             if (!term) {
                 setStatus(`Index: ${index.length} zákaziek` + (lastIndexUpdate ? ` (aktualiz. ${lastIndexUpdate.toLocaleTimeString()})` : ' (čaká sa na načítanie appky)'));
+                lastAutoOpenedKey = null;
                 return;
             }
+
             const matches = index.filter((it) => matchesTerm(it, term));
             setStatus(`${matches.length} výsledok/-ov (z ${index.length} položiek)`);
             matches.slice(0, 200).forEach((it) => resultsUl.appendChild(renderItem(it)));
+
+            if (matches.length === 1) {
+                const key = getItemKey(matches[0]);
+                if (key !== lastAutoOpenedKey) {
+                    lastAutoOpenedKey = key;
+                    openItem(matches[0]);
+                }
+            } else {
+                lastAutoOpenedKey = null;
+            }
         }
 
         input.addEventListener('input', () => render(input.value));
