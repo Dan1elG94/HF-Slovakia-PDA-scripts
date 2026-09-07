@@ -34,16 +34,6 @@
     XMLHttpRequest.prototype.send = function (body) {
         const url = this._pda_url || '';
 
-        // --- DOCASNE: logujeme vsetky volania na /client/1.0/, aby sme videli connectorCallRequest ---
-        if (url.includes('/client/1.0/')) {
-            console.log('[PDA DEBUG] request', this._pda_method || '', url, 'body:', body);
-            this.addEventListener('load', () => {
-            console.log('[PDA DEBUG] response', url, 'status:', this.status, 'body:', this.responseText.slice(0, 2000));
-            });
-        }
-        // --- koniec docasneho logovania ---
-
-
         if (this._pda_url && this._pda_url.includes(TARGET_URL_SUBSTRING)) {
         let parsedBody = null;
         try { parsedBody = JSON.parse(body); } catch (e) { /* ignore */ }
