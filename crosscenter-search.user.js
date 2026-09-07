@@ -89,6 +89,9 @@
   const TILE_WAIT_TIMEOUT = 15000;
   const SETTLE_DELAY = 350;
 
+  const TILE_ID_PREFIX = 'Main--Workcenter_Toolbar-';
+  const LIST_ID_PREFIX = 'Main--List2-';
+
   let opening = false;
   let renderFn = null;
 
@@ -147,39 +150,80 @@
         if (el) el.textContent = msg;
   }
 
-  async function openItem(item) {
-    if (opening) return;
-    opening = true;
-    try {
-        const tiles = Array.from(document.querySelectorAll(WORKCENTER_TILE_SELECTOR));
-        const tile = tiles.find((t) => getWorkcenterName(t) === item.workcenter);
-        if (!tile) {
-            setStatus('Pracovisko sa nenašlo na obrazovke (skús obnoviť stránku).');
-            return;
-        }
-        setStatus(`Otváram pracovisko ${item.workcenter}...`);
-        pressElement(tile);
-        await waitFor(() => document.getElementById(LIST_UL_ID), { timeout: TILE_WAIT_TIMEOUT });
-        await sleep(SETTLE_DELAY);
-        const ul = document.getElementById(LIST_UL_ID);
-        const targetText = formatProductionOrder(item);
-        const li = ul && Array.from(ul.querySelectorAll('li')).find(
-            (el) => extractField(el, 'ProductionOrder_Label') === targetText
-        );
-        if (!li) {
-            setStatus('Zákazka sa v zozname nenašla (možno sa medzitým zmenila). Skús obnoviť stránku.');
-            const homeButton = await waitFor(() => document.getElementById(HOME_BUTTON_ID));
-            pressElement(homeButton);
-            return;
-        }
-        pressElement(li);
-    } catch (e) {
-        console.warn('[PDA search] chyba pri otvarani zakazky', e);
-      setStatus('Nepodarilo sa otvoriť zákazku, skús znova.');
-    } finally {
-        opening = false;
-    }
+
+
+  function getListIdForTile(tile) {
+    if (!tile.id || !tile.id.startsWith(TILE_ID_PREFIX)) return null;
+    const suffix = tile.id.slice(TILE_ID_PREFIX.length); // napr. "Main--ui_layout_Grid3-5"
+    return LIST_ID_PREFIX + suffix; // "Main--List2-Main--ui_layout_Grid3-5"
   }
+
+  function extractOrderText(li) {
+    // Title control vnoreny v li, ID koncici na "-inner" (rovnaky pattern ako inde v apke)
+    const titleEl = li.querySelector('[id*="Title"][id$="-inner"]');
+    return titleEl ? titleEl.textContent.trim() : '';
+  }
+
+  async function openItem(item) {
+  if (opening) return;
+  opening = true;
+  try {
+    setStatus('Otváram zákazku...');
+
+    const tiles = Array.from(document.querySelectorAll(WORKCENTER_TILE_SELECTOR));
+    const tile = tiles.find((t) => getWorkcenterName(t) === item.workcenter);
+    if (!tile) {
+      setStatus('Pracovisko sa nenašlo.');
+      return;
+    }
+
+    const listId = getListIdForTile(tile);
+    let list = listId ? document.getElementById(listId) : null;
+
+    // Ak zoznam este nie je v DOM (panel nemusi byt rozbaleny), klikneme na dlazdicu a pockame
+    if (!list) {
+      pressElement(tile);
+      list = listId
+        ? await waitFor(() => document.getElementById(listId), { timeout: TILE_WAIT_TIMEOUT })
+        : null;
+    }
+
+    if (!list) {
+      setStatus('Zoznam zákaziek pre toto pracovisko sa nenašiel.');
+      return;
+    }
+
+    list.scrollIntoView({ block: 'center' });
+    await sleep(SETTLE_DELAY);
+
+    const targetText = formatProductionOrder(item);
+    let li = Array.from(list.querySelectorAll('li')).find(
+      (el) => extractOrderText(el) === targetText
+    );
+
+    // Ak sa zoznam este dorenderoval po kliku na dlazdicu, dame mu druhu sancu
+    if (!li) {
+      await sleep(SETTLE_DELAY);
+      li = Array.from(list.querySelectorAll('li')).find(
+        (el) => extractOrderText(el) === targetText
+      );
+    }
+
+    if (!li) {
+      setStatus('Konkrétna zákazka sa nenašla, otvorené je aspoň pracovisko.');
+      return;
+    }
+
+    li.scrollIntoView({ block: 'center' });
+    li.click();
+    setStatus('Otvorené: ' + targetText);
+  } catch (e) {
+    console.warn('[PDA search] chyba pri otváraní položky', e);
+    setStatus('Chyba pri otváraní zákazky.');
+  } finally {
+    opening = false;
+  }
+}
 
   function ensureLayout() {
     let wrapper = document.getElementById(WRAPPER_ID);
