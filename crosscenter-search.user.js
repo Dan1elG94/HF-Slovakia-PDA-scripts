@@ -470,6 +470,12 @@
                 if (key !== lastAutoOpenedKey) {
                     lastAutoOpenedKey = key;
                     openItem(matches[0]);
+
+                    // vycistit input a zoznam vysledkov
+                    input.value = '';
+                    resultsUl.innerHTML = '';
+                    setStatus(`Index: ${index.length} zákaziek` + (lastIndexUpdate ? ` (aktualiz. ${lastIndexUpdate.toLocaleTimeString()})` : ''));
+                    lastAutoOpenedKey = null;
                 }
             } else {
                 lastAutoOpenedKey = null;
