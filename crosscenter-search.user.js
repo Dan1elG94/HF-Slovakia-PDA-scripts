@@ -101,6 +101,37 @@
     let renderFn = null;
     let lastAutoOpenedKey = null;
 
+    // ---------- Dekodovanie dat zo skenera (SK klavesnica cita cisla ako specialne znaky) ----------
+    const SCANNER_CHAR_MAP = {
+        '+': '1',
+        'ľ': '2',
+        'š': '3',
+        'č': '4',
+        'ť': '5',
+        'ž': '6',
+        'ý': '7',
+        'á': '8',
+        'í': '9',
+        'é': '0',
+    };
+
+    function decodeScannerInput(raw) {
+        // najskor odstranit prvy znak J
+        const stripped = raw.slice(1);
+
+        let result = '';
+        for (const ch of stripped) {
+            if (ch === '.') {
+                result += '-';
+            } else if (SCANNER_CHAR_MAP.hasOwnProperty(ch)) {
+                result += SCANNER_CHAR_MAP[ch];
+            } else {
+                result += ch; // neznamy znak - necha tak ako je
+            }
+        }
+        return result;
+    }
+
     function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
     function waitFor(checkFn, { interval = 200, timeout = 10000 } = {}) {
@@ -411,6 +442,12 @@
             );
         }
 
+        function handleScannerInput() {
+            const decoded = decodeScannerInput(input.value);
+            input.value = decoded;
+            render(decoded);
+        }
+
         function render(filterText) {
             resultsUl.innerHTML = '';
             const term = filterText.trim().toLowerCase();
@@ -438,6 +475,12 @@
         }
 
         input.addEventListener('input', () => render(input.value));
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleScannerInput();
+            }
+        });
 
         list.appendChild(header);
         list.appendChild(searchToolbarContainer);
