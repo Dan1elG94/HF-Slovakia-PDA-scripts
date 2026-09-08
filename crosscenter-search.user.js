@@ -100,6 +100,7 @@
 
     let opening = false;
     let renderFn = null;
+    let updateStatusBorderFn = null;
     let lastAutoOpenedKey = null;
     let autofocusIntervalId = null;
 
@@ -405,34 +406,35 @@
         resultsUl.tabIndex = 0;
 
         function renderItem(it) {
-        const li = document.createElement('li');
-        li.tabIndex = 0;
-        li.setAttribute('role', 'option');
-        li.className = 'sapMLIB sapMLIB-CTX sapMLIBShowSeparator sapMLIBTypeActive sapMLIBActionable sapMLIBHoverable sapMLIBFocusable sapMCLI sapUiTinyMargin';
-        li.innerHTML = `
-            <div class="sapMLIBContent">
-            <div class="sapMFlexBoxFit sapMFlexBox sapMHBox sapMFlexBoxJustifyStart sapMFlexBoxAlignItemsStretch sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentSpaceBetween sapMFlexBoxBGTransparent" style="height:100%;width:100%;">
-                <div class="sapMFlexBox sapMVBox sapMFlexBoxJustifyStart sapMFlexBoxAlignItemsStretch sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentSpaceBetween sapMFlexBoxBGTransparent sapMFlexItem" style="height:100%;width:100%;">
-                <span class="sapMLabel sapUiSelectable sapMLabelMaxWidth sapUiTinyMargin sapUiNoMarginBottom sapMFlexItem" style="font-weight:bold;text-align:left;">
-                    <span class="sapMLabelTextWrapper"><bdi>${formatProductionOrder(it)}</bdi></span>
-                </span>
-                <span class="sapMLabel sapUiSelectable sapMLabelMaxWidth sapUiTinyMargin sapUiNoMarginBottom sapMFlexItem" style="text-align:left;">
-                    <span class="sapMLabelTextWrapper"><bdi>${it.workcenter}</bdi></span>
-                </span>
-                <span class="sapMLabel sapUiSelectable sapMLabelMaxWidth sapUiTinyMargin sapUiNoMarginBottom sapMFlexItem" style="text-align:left;">
-                    <span class="sapMLabelTextWrapper"><bdi>${it.material || ''}</bdi></span>
-                </span>
-                <span class="sapMLabel sapUiSelectable sapMLabelMaxWidth sapMFlexItem" style="text-align:left;">
-                    <span class="sapMLabelTextWrapper"><bdi>${it.descriptionShort || ''}</bdi></span>
-                </span>
+            const li = document.createElement('li');
+            li.tabIndex = 0;
+            li.setAttribute('role', 'option');
+            li.className = 'sapMLIB sapMLIB-CTX sapMLIBShowSeparator sapMLIBTypeActive sapMLIBActionable sapMLIBHoverable sapMLIBFocusable sapMCLI sapUiTinyMargin';
+            li.innerHTML = `
+                <div class="sapMLIBContent">
+                <div class="sapMFlexBoxFit sapMFlexBox sapMHBox sapMFlexBoxJustifyStart sapMFlexBoxAlignItemsStretch sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentSpaceBetween sapMFlexBoxBGTransparent" style="height:100%;width:100%;">
+                    <div class="sapMFlexBox sapMVBox sapMFlexBoxJustifyStart sapMFlexBoxAlignItemsStretch sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentSpaceBetween sapMFlexBoxBGTransparent sapMFlexItem" style="height:100%;width:100%;">
+                    <span class="sapMLabel sapUiSelectable sapMLabelMaxWidth sapUiTinyMargin sapUiNoMarginBottom sapMFlexItem" style="font-weight:bold;text-align:left;">
+                        <span class="sapMLabelTextWrapper"><bdi>${formatProductionOrder(it)}</bdi></span>
+                    </span>
+                    <span class="sapMLabel sapUiSelectable sapMLabelMaxWidth sapUiTinyMargin sapUiNoMarginBottom sapMFlexItem" style="text-align:left;">
+                        <span class="sapMLabelTextWrapper"><bdi>${it.workcenter}</bdi></span>
+                    </span>
+                    <span class="sapMLabel sapUiSelectable sapMLabelMaxWidth sapUiTinyMargin sapUiNoMarginBottom sapMFlexItem" style="text-align:left;">
+                        <span class="sapMLabelTextWrapper"><bdi>${it.material || ''}</bdi></span>
+                    </span>
+                    <span class="sapMLabel sapUiSelectable sapMLabelMaxWidth sapMFlexItem" style="text-align:left;">
+                        <span class="sapMLabelTextWrapper"><bdi>${it.descriptionShort || ''}</bdi></span>
+                    </span>
+                    </div>
                 </div>
-            </div>
-            </div>`;
-        li.addEventListener('click', () => openItem(it));
-        li.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openItem(it); }
-        });
-        return li;
+                </div>`;
+
+            li.addEventListener('click', () => openItem(it));
+            li.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === '') { e.preventDefault(); openItem(it); } 
+            });
+            return li;
         }
 
         function matchesTerm(it, term) {
@@ -456,6 +458,19 @@
             const decoded = decodeScannerInput(input.value);
             input.value = decoded;
             render(decoded);
+        }
+
+        function updateInputStatusBorder() {
+            const isLoaded = !!lastIndexUpdate;
+            const isFocused = document.activeElement === input;
+
+            if (!isLoaded) {
+                input.style.border = '2px solid #d9534f'; // cervena - zakazky sa este nacitali
+            } else if (isFocused) {
+                input.style.border = '2px solid #28a745'; // zelena - nacitane, focus na inpute
+            } else {
+                input.style.border = '1px solid #000000'; // cierna - nacitane, focus inde
+            }
         }
 
         function render(filterText) {
@@ -506,8 +521,13 @@
         list.appendChild(resultsUl);
         sidebar.appendChild(list);
 
+        input.addEventListener('focus', updateInputStatusBorder);
+        input.addEventListener('blur', updateInputStatusBorder);
+
         render('');
         renderFn = render;
+        updateStatusBorderFn = updateInputStatusBorder;
+        updateInputStatusBorder();
 
         input.focus();
         startAutofocusGuard();
@@ -517,6 +537,9 @@
         if (renderFn) {
         const input = document.querySelector(`#${UI_ID} input.sapMSFI`);
         renderFn(input ? input.value : '');
+        }
+        if (updateStatusBorderFn) {
+            updateStatusBorderFn();
         }
     }
 
