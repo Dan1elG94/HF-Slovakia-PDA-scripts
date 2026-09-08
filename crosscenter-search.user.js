@@ -471,11 +471,13 @@
                     lastAutoOpenedKey = key;
                     openItem(matches[0]);
 
-                    // vycistit input a zoznam vysledkov
-                    input.value = '';
-                    resultsUl.innerHTML = '';
-                    setStatus(`Index: ${index.length} zákaziek` + (lastIndexUpdate ? ` (aktualiz. ${lastIndexUpdate.toLocaleTimeString()})` : ''));
-                    lastAutoOpenedKey = null;
+                    // vycistit input a zoznam vysledkov s oneskerenim 500ms
+                    setTimeout(() => {
+                        input.value = '';
+                        resultsUl.innerHTML = '';
+                        setStatus(`Index: ${index.length} zákaziek` + (lastIndexUpdate ? ` (aktualiz. ${lastIndexUpdate.toLocaleTimeString()})` : ''));
+                        lastAutoOpenedKey = null;
+                    }, 500);
                 }
             } else {
                 lastAutoOpenedKey = null;
