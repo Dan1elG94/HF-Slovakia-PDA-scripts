@@ -93,6 +93,7 @@
 
     const TILE_WAIT_TIMEOUT = 15000;
     const SETTLE_DELAY = 350;
+    const AUTOFOCUS_INTERVAL = 1000;
 
     const TILE_ID_PREFIX = 'Main--Workcenter_Toolbar-';
     const LIST_ID_PREFIX = 'Main--List2-';
@@ -100,6 +101,7 @@
     let opening = false;
     let renderFn = null;
     let lastAutoOpenedKey = null;
+    let autofocusIntervalId = null;
 
     // ---------- Dekodovanie dat zo skenera (SK klavesnica cita cisla ako specialne znaky) ----------
     const SCANNER_CHAR_MAP = {
@@ -490,6 +492,9 @@
 
         render('');
         renderFn = render;
+
+        input.focus();
+        startAutofocusGuard();
     }
 
     function refreshSearchUIIfPresent() {
@@ -497,6 +502,23 @@
         const input = document.querySelector(`#${UI_ID} input.sapMSFI`);
         renderFn(input ? input.value : '');
         }
+    }
+
+    function startAutofocusGuard() {
+        if (autofocusIntervalId) {
+            clearInterval(autofocusIntervalId);
+        }
+        autofocusIntervalId = setInterval(() => {
+            const currentInput = document.querySelector(`#${UI_ID} input.sapMSFI`);
+            if (!currentInput) return;
+
+            const active = document.activeElement;
+            const nothingMeaningfulFocused = !active || active === document.body;
+
+            if (nothingMeaningfulFocused) {
+                currentInput.focus();
+            }
+        }, AUTOFOCUS_INTERVAL);
     }
 
     function isOnMainScreen() {
