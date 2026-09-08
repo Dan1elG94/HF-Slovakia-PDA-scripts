@@ -465,9 +465,9 @@
             const isFocused = document.activeElement === input;
 
             if (!isLoaded) {
-                form.style.border = '2px solid #d9534f'; // cervena - zakazky sa este nacitali
+                form.style.border = '4px solid #d9534f'; // cervena - zakazky sa este nacitali
             } else if (isFocused) {
-                form.style.border = '2px solid #28a745'; // zelena - nacitane, focus na inpute
+                form.style.border = '4px solid #28a745'; // zelena - nacitane, focus na inpute
             } else {
                 form.style.border = '2px solid #000000'; // cierna - nacitane, focus inde
             }
