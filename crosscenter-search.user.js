@@ -118,20 +118,28 @@
     };
 
     function decodeScannerInput(raw) {
-        // najskor odstranit prvy znak J
+        // prvy znak (napr. "J") je marker skenera, nie je sucastou dat
         const stripped = raw.slice(1);
 
-        let result = '';
+        let translated = '';
         for (const ch of stripped) {
             if (ch === '.') {
-                result += '-';
+                translated += '-';
             } else if (SCANNER_CHAR_MAP.hasOwnProperty(ch)) {
-                result += SCANNER_CHAR_MAP[ch];
+                translated += SCANNER_CHAR_MAP[ch];
             } else {
-                result += ch; // neznamy znak - necha tak ako je
+                translated += ch; // neznamy znak - necha tak ako je
             }
         }
-        return result;
+
+        const dashIndex = translated.indexOf('-');
+        if (dashIndex === -1) return translated;
+
+        const orderPart = translated.slice(0, dashIndex);
+        const opPart = translated.slice(dashIndex + 1);
+        const paddedOpPart = opPart.padStart(4, '0');
+
+        return orderPart + '-' + paddedOpPart;
     }
 
     function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
