@@ -513,9 +513,10 @@
             if (!currentInput) return;
 
             const active = document.activeElement;
-            const nothingMeaningfulFocused = !active || active === document.body;
+            const isButton = !!active && (active.tagName === 'BUTTON' || active.getAttribute('role') === 'button');
+            const okToRefocus = !active || active === document.body || isButton;
 
-            if (nothingMeaningfulFocused) {
+            if (okToRefocus) {
                 currentInput.focus();
             }
         }, AUTOFOCUS_INTERVAL);
