@@ -465,11 +465,14 @@
             const isFocused = document.activeElement === input;
 
             if (!isLoaded) {
-                form.style.border = '4px solid #d9534f'; // cervena - zakazky sa este nacitali
+                form.style.border = '3px solid #d9534f'; // cervena - zakazky sa este nacitali
+                input.placeholder = 'Načítavam dáta, prosím počkajte...';
             } else if (isFocused) {
-                form.style.border = '4px solid #28a745'; // zelena - nacitane, focus na inpute
+                form.style.border = '3px solid #28a745'; // zelena - nacitane, focus na inpute
+                input.placeholder = 'Načítaj číslo zákazky';
             } else {
-                form.style.border = '2px solid #000000'; // cierna - nacitane, focus inde
+                form.style.border = '3px solid #000000'; // cierna - nacitane, focus inde
+                input.placeholder = 'Načítaj číslo zákazky';
             }
         }
 
