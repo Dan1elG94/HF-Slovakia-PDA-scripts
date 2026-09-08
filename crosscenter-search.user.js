@@ -465,11 +465,11 @@
             const isFocused = document.activeElement === input;
 
             if (!isLoaded) {
-                input.style.border = '2px solid #d9534f'; // cervena - zakazky sa este nacitali
+                form.style.border = '2px solid #d9534f'; // cervena - zakazky sa este nacitali
             } else if (isFocused) {
-                input.style.border = '2px solid #28a745'; // zelena - nacitane, focus na inpute
+                form.style.border = '2px solid #28a745'; // zelena - nacitane, focus na inpute
             } else {
-                input.style.border = '1px solid #000000'; // cierna - nacitane, focus inde
+                form.style.border = '2px solid #000000'; // cierna - nacitane, focus inde
             }
         }
 
