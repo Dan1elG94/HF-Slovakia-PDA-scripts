@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PDA - Cross-workcenter search (XHR data)
 // @namespace    http://tampermonkey.net/
-// @version      0.0.3
+// @version      0.0.4
 // @description  Searchbar na vyhladavanie naprieč vsetkymi pracoviskami
 // @author       Gabris
 // @updateURL    https://github.com/Dan1elG94/HF-Slovakia-PDA-scripts/raw/refs/heads/main/crosscenter-search.user.js
@@ -79,14 +79,15 @@
         return originalSend.apply(this, arguments);
     };
 
-    // ---------- Layout (lavy sidebar) ----------
+    // ---------- Layout ----------
     const PANEL_ID = 'Main--Workcenter_Panel';
     const CONTENT_ID = 'Main--Workcenter_Panel-content';
     const WORKCENTER_TILE_SELECTOR = '[id^="Main--Workcenter_Toolbar-Main--ui_layout_Grid3-"]';
     const LIST_UL_ID = 'WorkcenterDetail--Work_List-listUl';
     const HOME_BUTTON_ID = 'Main--Button_HomeScreen';
 
-    const WRAPPER_ID = '__pda_content_wrapper__';
+    const PARENT_SECTION_ID = 'Main--MainPage-cont';
+    const TASKS_PANEL_ID = 'Main--Tasks_Panel';
     const SIDEBAR_ID = '__pda_search_sidebar__';
     const UI_ID = '__pda_custom_search_ui__';
 
@@ -285,43 +286,31 @@
     }
 
     function ensureLayout() {
-        let wrapper = document.getElementById(WRAPPER_ID);
-        let sidebar = document.getElementById(SIDEBAR_ID);
+        const parentSection = document.getElementById(PARENT_SECTION_ID);
+        const tasksPanel = document.getElementById(TASKS_PANEL_ID);
+        const workcenterPanel = document.getElementById(PANEL_ID);
 
-        const panel = document.getElementById(PANEL_ID);
-        const content = document.getElementById(CONTENT_ID);
-        if (!panel || !content) return null;
+        if (!parentSection || !tasksPanel || !workcenterPanel) return null;
 
-        if (!wrapper) {
-            wrapper = document.createElement('div');
-            wrapper.id = WRAPPER_ID;
-            wrapper.style.display = 'flex';
-            wrapper.style.flexDirection = 'row';
-            wrapper.style.alignItems = 'flex-start';
-            wrapper.style.width = '100%';
-            wrapper.style.backgroundColor = '#ffffff';
-            wrapper.style.paddingLeft = '10px';
-        }
-        if (!sidebar) {
-        sidebar = document.createElement('div');
-        sidebar.id = SIDEBAR_ID;
-        sidebar.style.flex = '0 0 340px';
-        sidebar.style.maxWidth = '340px';
-        sidebar.style.maxHeight = '80vh';
-        sidebar.style.overflowY = 'auto';
-        sidebar.style.border = '1px solid #000000';
+        let searchContainer = document.getElementById(SIDEBAR_ID);
+        if (!searchContainer) {
+            searchContainer = document.createElement('div');
+            searchContainer.id = SIDEBAR_ID;
+            searchContainer.style.width = '100%';
+            searchContainer.style.boxSizing = 'border-box';
+            searchContainer.style.maxHeight = '80vh';
+            searchContainer.style.overflowY = 'auto';
+            searchContainer.style.border = '1px solid #000000';
+            searchContainer.style.margin = '10px 0';
         }
 
-        if (!wrapper.contains(content)) {
-        panel.insertBefore(wrapper, content);
-        wrapper.appendChild(sidebar);
-        wrapper.appendChild(content);
-        content.style.flex = '1 1 auto';
-        content.style.minWidth = '0';
+        // Vlozime nas searchbar medzi Tasks_Panel a Workcenter_Panel, ak tam este nie je
+        if (searchContainer.nextElementSibling !== workcenterPanel || searchContainer.parentElement !== parentSection) {
+            parentSection.insertBefore(searchContainer, workcenterPanel);
         }
 
-        if (!document.getElementById(UI_ID)) buildCustomSearchUI(sidebar);
-        return { wrapper, sidebar };
+        if (!document.getElementById(UI_ID)) buildCustomSearchUI(searchContainer);
+        return { searchContainer };
     }
 
     function buildCustomSearchUI(sidebar) {
