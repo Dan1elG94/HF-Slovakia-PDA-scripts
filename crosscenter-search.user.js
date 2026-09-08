@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PDA - Cross-workcenter search (XHR data)
 // @namespace    http://tampermonkey.net/
-// @version      0.0.4
+// @version      0.0.5
 // @description  Searchbar na vyhladavanie naprieč vsetkymi pracoviskami
 // @author       Gabris
 // @updateURL    https://github.com/Dan1elG94/HF-Slovakia-PDA-scripts/raw/refs/heads/main/crosscenter-search.user.js
@@ -145,10 +145,6 @@
     function extractField(li, marker) {
         const el = li.querySelector(`[id*="${marker}"][id$="-bdi"]`);
         return el ? el.textContent.trim() : '';
-    }
-
-    function formatProductionOrder(item) {
-        return `${item.productionOrderNo} - ${item.operationNo} - ${item.sequenceNo}`;
     }
 
     function formatProductionOrder(item) {
@@ -300,8 +296,9 @@
             searchContainer.style.boxSizing = 'border-box';
             searchContainer.style.maxHeight = '80vh';
             searchContainer.style.overflowY = 'auto';
-            searchContainer.style.border = '1px solid #000000';
             searchContainer.style.margin = '10px 0';
+            searchContainer.style.backgroundColor = '#ffffff';
+            searchContainer.style.borderRadius = '10px';
         }
 
         // Vlozime nas searchbar medzi Tasks_Panel a Workcenter_Panel, ak tam este nie je
@@ -323,7 +320,7 @@
         header.className = 'sapMIBar sapMTB sapMTBNewFlex sapMTBInactive sapMTBStandard sapMTB-Transparent-CTX sapMListHdr sapMListHdrTBar sapMTBHeader-CTX';
         const headerTitle = document.createElement('div');
         headerTitle.className = 'sapMTitle sapMTitleStyleAuto sapMTitleNoWrap sapUiSelectable sapMTitleMaxWidth sapMTitleTB sapMBarChild sapMTBShrinkItem';
-        headerTitle.innerHTML = '<span dir="auto">Hľadanie naprieč pracoviskami</span>';
+        headerTitle.innerHTML = '<span dir="auto">Číslo zákazky</span>';
         header.appendChild(headerTitle);
 
         const searchToolbarContainer = document.createElement('div');
