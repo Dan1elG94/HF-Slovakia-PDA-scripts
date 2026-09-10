@@ -17,7 +17,7 @@
     'use strict';
 
     const HIDDEN_INPUT_ID = '__pda_hidden_scanner_input__';
-    const CARD_ID_LENGTH = 9;
+    const CARD_ID_LENGTH = 10;
     const REFOCUS_INTERVAL = 1000;
 
     const SCANNER_CHAR_MAP = {
