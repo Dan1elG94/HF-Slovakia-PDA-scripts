@@ -16,6 +16,7 @@
 (function () {
     'use strict';
 
+    const SEARCH_INPUT_SELECTOR = '#__pda_custom_search_ui__ input.sapMSFI';
     const HIDDEN_INPUT_ID = '__pda_hidden_scanner_input__';
     const CARD_ID_LENGTH = 10;
     const REFOCUS_INTERVAL = 1000;
@@ -56,14 +57,35 @@
         return { type: 'order', value: decoded };
     }
 
+    function padOperationPart(decoded) {
+        const dashIndex = decoded.indexOf('-');
+        if (dashIndex === -1) return decoded;
+
+        const orderPart = decoded.slice(0, dashIndex);
+        const opPart = decoded.slice(dashIndex + 1);
+        return orderPart + '-' + opPart.padStart(4, '0');
+    }
+
+    function fillOrderSearchInput(value) {
+        const searchInput = document.querySelector(SEARCH_INPUT_SELECTOR);
+        if (!searchInput) {
+            console.warn('[PDA input-listener] crosscenter-search input sa nenasiel, zakazka nebola vlozena');
+            return;
+        }
+        searchInput.value = value;
+        searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
     function handleRawInput(raw) {
         const decoded = decodeRawInput(raw);
         const classified = classifyInput(decoded);
 
         if (classified.type === 'card') {
-            console.log('[PDA input-listener] rozpoznane ID karty:', classified.value, '(dlzka:', decoded.length, ')');
+            console.log('[PDA input-listener] rozpoznane ID karty:', classified.value);
         } else {
-            console.log('[PDA input-listener] rozpoznane cislo zakazky:', classified.value, '(dlzka:', decoded.length, ')');
+            const finalValue = padOperationPart(classified.value);
+            console.log('[PDA input-listener] rozpoznane cislo zakazky:', finalValue);
+            fillOrderSearchInput(finalValue);
         }
     }
 
