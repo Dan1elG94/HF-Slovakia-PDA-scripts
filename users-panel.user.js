@@ -35,7 +35,7 @@
   // --- Zoznam pouzivatelov na rychle prepinanie ---
   const USERS = [
     { username: 'Daniel Gabris', password: '33631', cardId: '0116984be8' },
-    { username: 'Peter Gabor', password: '32986', cardId: '0123456789' },
+    { username: 'Peter Gabor', password: '32986', cardId: '01169837b0' },
     { username: 'Lubomir Zilka', password: '33330', cardId: '0123456789' },
     { username: 'Robert Ziacek', password: '98220', cardId: '0123456789' },
     { username: 'Vladislav Dlhy', password: '41282', cardId: '0123456789' },
