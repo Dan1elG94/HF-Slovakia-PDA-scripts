@@ -18,6 +18,7 @@
 
     const HIDDEN_INPUT_ID = '__pda_hidden_scanner_input__';
     const CARD_ID_LENGTH = 9;
+    const REFOCUS_INTERVAL = 1000;
 
     const SCANNER_CHAR_MAP = {
         '+': '1',
@@ -33,20 +34,19 @@
     };
 
     function decodeRawInput(raw) {
-        // prvy znak (napr. "J") je marker skenera/citacky - nie je sucastou dat
-        const stripped = raw.slice(1);
+    // ak je prvy znak J - odstranit
+    const stripped = raw.length > 0 && raw[0] === 'J' ? raw.slice(1) : raw;
 
-        let translated = '';
-        for (const ch of stripped) {
-            if (ch === '.') {
-                translated += '-';
-            } else if (SCANNER_CHAR_MAP.hasOwnProperty(ch)) {
-                translated += SCANNER_CHAR_MAP[ch];
-            } else {
-                translated += ch;
-            }
-        }
-        return translated;
+    let translated = '';
+    for (const ch of stripped) {
+        if (ch === '.') {
+            translated += '-';
+        } else if (SCANNER_CHAR_MAP.hasOwnProperty(ch)) {
+            translated += SCANNER_CHAR_MAP[ch];
+        } else {
+            translated += ch;
+        }}
+    return translated;
     }
 
     function classifyInput(decoded) {
@@ -114,7 +114,7 @@
     function init() {
         const input = createHiddenInput();
         input.focus();
-        setInterval(() => ensureFocus(input), 2000);
+        setInterval(() => ensureFocus(input), REFOCUS_INTERVAL);
     }
 
     if (document.readyState === 'loading') {
