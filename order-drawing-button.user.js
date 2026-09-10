@@ -40,7 +40,7 @@
         button.style.width = '150px';
         button.style.flex = '0 0 150px';
         button.style.alignSelf = 'flex-start';
-        button.style.marginRight = 'auto';
+        button.style.marginLeft = 'auto';
 
         const label = document.createElement('span');
         label.textContent = 'VÝKRES';
