@@ -36,11 +36,13 @@
         button.style.borderRadius = '6px';
         button.style.backgroundColor = '#ffffff';
         button.style.cursor = 'pointer';
-        button.style.marginBottom = '8px';
+        button.style.position = 'absolute';
+        button.style.top = '0';
+        button.style.right = '0';
         button.style.width = '150px';
-        button.style.flex = '0 0 150px';
-        button.style.alignSelf = 'flex-start';
-        button.style.marginLeft = 'auto';
+        button.style.height = 'auto';
+        button.style.margin = '0';
+        button.style.zIndex = '1';
 
         const label = document.createElement('span');
         label.textContent = 'VÝKRES';
@@ -72,6 +74,11 @@
         const container = document.getElementById(CONTAINER_ID);
         if (!container) return;
         if (document.getElementById(BUTTON_ID)) return;
+
+        const containerPosition = window.getComputedStyle(container).position;
+        if (containerPosition === 'static') {
+            container.style.position = 'relative';
+        }
 
         const button = buildButton();
         container.insertBefore(button, container.firstChild);
