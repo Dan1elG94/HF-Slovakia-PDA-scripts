@@ -76,19 +76,28 @@
         searchInput.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
+    function findUserByCardId(cardId) {
+        const users = window.PDA_USERS || [];
+        return users.find((u) => u.cardId === cardId) || null;
+    }
+
     function handleRawInput(raw) {
         const decoded = decodeRawInput(raw);
         const classified = classifyInput(decoded);
 
         if (classified.type === 'card') {
-            console.log('[PDA input-listener] rozpoznane ID karty:', classified.value);
+            const user = findUserByCardId(classified.value);
+            if (user) {
+                console.log('[PDA input-listener] karta patri uzivatelovi:', user.username);
+            } else {
+                console.warn('[PDA input-listener] karta nerozpoznana, ID:', classified.value);
+            }
         } else {
             const finalValue = padOperationPart(classified.value);
             console.log('[PDA input-listener] rozpoznane cislo zakazky:', finalValue);
             fillOrderSearchInput(finalValue);
         }
     }
-
     function createHiddenInput() {
         let input = document.getElementById(HIDDEN_INPUT_ID);
         if (input) return input;

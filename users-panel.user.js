@@ -34,11 +34,13 @@
 
   // --- Zoznam pouzivatelov na rychle prepinanie ---
   const USERS = [
-    { username: 'Daniel Gabris', password: '33631' },
-    { username: 'Peter Gabor', password: '32986' },
-    { username: 'Lubomir Zilka', password: '33330' },
-    { username: 'Vladislav Dlhy', password: '41282' },
+    { username: 'Daniel Gabris', password: '33631', cardId: '0116984be8' },
+    { username: 'Peter Gabor', password: '32986', cardId: '0123456789' },
+    { username: 'Lubomir Zilka', password: '33330', cardId: '0123456789' },
+    { username: 'Robert Ziacek', password: '98220', cardId: '0123456789' },
+    { username: 'Vladislav Dlhy', password: '41282', cardId: '0123456789' },
   ];
+  window.PDA_USERS = USERS;
 
   const DIALOG_WAIT_TIMEOUT = 10000;
   const BEFORE_CONFIRM_DELAY = 100;
