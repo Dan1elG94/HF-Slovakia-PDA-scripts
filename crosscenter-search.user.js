@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PDA - Cross-workcenter search (XHR data)
 // @namespace    http://tampermonkey.net/
-// @version      0.0.5
+// @version      0.0.6
 // @description  Searchbar na vyhladavanie naprieč vsetkymi pracoviskami
 // @author       Gabris
 // @updateURL    https://github.com/Dan1elG94/HF-Slovakia-PDA-scripts/raw/refs/heads/main/crosscenter-search.user.js
@@ -93,16 +93,13 @@
 
     const TILE_WAIT_TIMEOUT = 15000;
     const SETTLE_DELAY = 350;
-    const AUTOFOCUS_INTERVAL = 1000;
 
     const TILE_ID_PREFIX = 'Main--Workcenter_Toolbar-';
     const LIST_ID_PREFIX = 'Main--List2-';
 
     let opening = false;
     let renderFn = null;
-    let updateStatusBorderFn = null;
     let lastAutoOpenedKey = null;
-    let autofocusIntervalId = null;
 
     // ---------- Dekodovanie dat zo skenera (SK klavesnica cita cisla ako specialne znaky) ----------
     const SCANNER_CHAR_MAP = {
@@ -460,22 +457,6 @@
             render(decoded);
         }
 
-        function updateInputStatusBorder() {
-            const isLoaded = !!lastIndexUpdate;
-            const isFocused = document.activeElement === input;
-
-            if (!isLoaded) {
-                form.style.border = '3px solid #d9534f'; // cervena - zakazky sa este nacitali
-                input.placeholder = 'Načítavam dáta, prosím počkajte...';
-            } else if (isFocused) {
-                form.style.border = '3px solid #28a745'; // zelena - nacitane, focus na inpute
-                input.placeholder = 'Načítaj číslo zákazky';
-            } else {
-                form.style.border = '3px solid #000000'; // cierna - nacitane, focus inde
-                input.placeholder = 'Načítaj číslo zákazky';
-            }
-        }
-
         function render(filterText) {
             resultsUl.innerHTML = '';
             const term = filterText.trim().toLowerCase();
@@ -524,16 +505,10 @@
         list.appendChild(resultsUl);
         sidebar.appendChild(list);
 
-        input.addEventListener('focus', updateInputStatusBorder);
-        input.addEventListener('blur', updateInputStatusBorder);
-
         render('');
         renderFn = render;
-        updateStatusBorderFn = updateInputStatusBorder;
-        updateInputStatusBorder();
 
         input.focus();
-        startAutofocusGuard();
     }
 
     function refreshSearchUIIfPresent() {
@@ -541,27 +516,6 @@
         const input = document.querySelector(`#${UI_ID} input.sapMSFI`);
         renderFn(input ? input.value : '');
         }
-        if (updateStatusBorderFn) {
-            updateStatusBorderFn();
-        }
-    }
-
-    function startAutofocusGuard() {
-        if (autofocusIntervalId) {
-            clearInterval(autofocusIntervalId);
-        }
-        autofocusIntervalId = setInterval(() => {
-            const currentInput = document.querySelector(`#${UI_ID} input.sapMSFI`);
-            if (!currentInput) return;
-
-            const active = document.activeElement;
-            const isButton = !!active && (active.tagName === 'BUTTON' || active.getAttribute('role') === 'button');
-            const okToRefocus = !active || active === document.body || isButton;
-
-            if (okToRefocus) {
-                currentInput.focus();
-            }
-        }, AUTOFOCUS_INTERVAL);
     }
 
     function isOnMainScreen() {
