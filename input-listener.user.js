@@ -88,7 +88,12 @@
         if (classified.type === 'card') {
             const user = findUserByCardId(classified.value);
             if (user) {
-                console.log('[PDA input-listener] karta patri uzivatelovi:', user.username);
+                console.log('[PDA input-listener] karta patri uzivatelovi:', user.username, '- prepinam...');
+                if (typeof window.PDA_switchToUser === 'function') {
+                    window.PDA_switchToUser(user.username, user.password);
+                } else {
+                    console.warn('[PDA input-listener] funkcia switchToUser nie je dostupna (userpanel skript sa este nenacital?)');
+                }
             } else {
                 console.warn('[PDA input-listener] karta nerozpoznana, ID:', classified.value);
             }
@@ -98,6 +103,7 @@
             fillOrderSearchInput(finalValue);
         }
     }
+
     function createHiddenInput() {
         let input = document.getElementById(HIDDEN_INPUT_ID);
         if (input) return input;

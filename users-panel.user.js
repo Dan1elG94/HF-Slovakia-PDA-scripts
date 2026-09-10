@@ -40,7 +40,6 @@
     { username: 'Robert Ziacek', password: '98220', cardId: '0123456789' },
     { username: 'Vladislav Dlhy', password: '41282', cardId: '0123456789' },
   ];
-  window.PDA_USERS = USERS;
 
   const DIALOG_WAIT_TIMEOUT = 10000;
   const BEFORE_CONFIRM_DELAY = 100;
@@ -271,6 +270,11 @@
 
   ensureLayout();
   injectStyles();
+
+  // Global functions and variables
+  window.PDA_USERS = USERS;
+  window.PDA_switchToUser = switchToUser;
+  //------------------------------
 
   const observer = new MutationObserver(ensureLayout);
   observer.observe(document.body, { childList: true, subtree: true });
