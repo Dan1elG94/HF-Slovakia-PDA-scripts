@@ -52,6 +52,7 @@
         button.style.cursor = 'pointer';
         button.style.width = '150px';
         button.style.flexShrink = '0';
+        button.style.marginRight = '8px';
 
         const label = document.createElement('span');
         label.textContent = 'VÝKRES';
