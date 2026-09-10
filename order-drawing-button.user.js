@@ -19,8 +19,22 @@
 (function () {
     'use strict';
 
+    const WRAPPER_ID = '__pda_order_drawing_wrapper__';
     const CONTAINER_ID = 'WorkcenterDetail--Order_FlexBox';
     const BUTTON_ID = '__pda_order_drawing_button__';
+
+    function buildWrapper() {
+        const wrapper = document.createElement('div');
+        wrapper.id = WRAPPER_ID;
+        wrapper.style.display = 'flex';
+        wrapper.style.justifyContent = 'flex-end';
+        wrapper.style.width = '100%';
+        wrapper.style.boxSizing = 'border-box';
+        wrapper.style.marginBottom = '8px';
+
+        wrapper.appendChild(buildButton());
+        return wrapper;
+    }
 
     function buildButton() {
         const button = document.createElement('button');
@@ -36,13 +50,8 @@
         button.style.borderRadius = '6px';
         button.style.backgroundColor = '#ffffff';
         button.style.cursor = 'pointer';
-        button.style.position = 'absolute';
-        button.style.top = '0';
-        button.style.right = '0';
         button.style.width = '150px';
-        button.style.height = 'auto';
-        button.style.margin = '0';
-        button.style.zIndex = '1';
+        button.style.flexShrink = '0';
 
         const label = document.createElement('span');
         label.textContent = 'VÝKRES';
@@ -73,15 +82,10 @@
     function ensureButton() {
         const container = document.getElementById(CONTAINER_ID);
         if (!container) return;
-        if (document.getElementById(BUTTON_ID)) return;
+        if (document.getElementById(WRAPPER_ID)) return;
 
-        const containerPosition = window.getComputedStyle(container).position;
-        if (containerPosition === 'static') {
-            container.style.position = 'relative';
-        }
-
-        const button = buildButton();
-        container.insertBefore(button, container.firstChild);
+        const wrapper = buildWrapper();
+        container.insertBefore(wrapper, container.firstChild);
     }
 
     let debounceTimer = null;
@@ -95,7 +99,7 @@
 
     scheduleEnsure();
     const observer = new MutationObserver(() => {
-        if (!document.getElementById(BUTTON_ID)) scheduleEnsure();
+        if (!document.getElementById(WRAPPER_ID)) scheduleEnsure();
     });
     observer.observe(document.body, { childList: true, subtree: true });
 })();
