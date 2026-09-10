@@ -380,7 +380,7 @@
         const resetDiv = document.createElement('div');
         resetDiv.title = 'Resetovať';
         resetDiv.className = 'sapMSFR sapMSFB';
-        resetDiv.addEventListener('click', () => { input.value = ''; render(''); input.focus(); });
+        resetDiv.addEventListener('click', () => { input.value = ''; render(''); });
         const searchDiv = document.createElement('div');
         searchDiv.title = 'Hľadať';
         searchDiv.className = 'sapMSFS sapMSFB';
@@ -507,8 +507,6 @@
 
         render('');
         renderFn = render;
-
-        input.focus();
     }
 
     function refreshSearchUIIfPresent() {
