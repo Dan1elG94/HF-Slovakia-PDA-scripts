@@ -37,6 +37,10 @@
         button.style.backgroundColor = '#ffffff';
         button.style.cursor = 'pointer';
         button.style.marginBottom = '8px';
+        button.style.width = '150px';
+        button.style.flex = '0 0 150px';
+        button.style.alignSelf = 'flex-start';
+        button.style.marginRight = 'auto';
 
         const label = document.createElement('span');
         label.textContent = 'VÝKRES';
