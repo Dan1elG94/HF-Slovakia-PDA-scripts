@@ -33,6 +33,15 @@
 
     let drawingIndex = {};
 
+    function cleanExcelText(value) {
+        if (value == null) return '';
+        let str = String(value).trim();
+        if (str.startsWith("'")) {
+            str = str.slice(1);
+        }
+        return str;
+    }
+
     function buildDrawingIndex(rows) {
         const index = {};
 
@@ -43,13 +52,12 @@
             const orderNoRaw = row[COL_ORDER_NO];
             if (orderNoRaw === undefined || orderNoRaw === null || orderNoRaw === '') continue;
 
-            const key = String(orderNoRaw).trim();
-            const drawingNoRaw = row[COL_DRAWING_NO];
-            const versionRaw = row[COL_VERSION];
+            const key = cleanExcelText(orderNoRaw);
+            if (!key) continue;
 
             index[key] = {
-                drawingNo: drawingNoRaw != null ? String(drawingNoRaw).trim() : '',
-                version: versionRaw != null ? String(versionRaw).trim() : '',
+                drawingNo: cleanExcelText(row[COL_DRAWING_NO]),
+                version: cleanExcelText(row[COL_VERSION]),
             };
         }
 
