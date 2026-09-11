@@ -255,6 +255,7 @@
 
     async function openItem(item) {
         if (opening) return;
+
         opening = true;
         try {
             setStatus('Otváram zákazku...');
