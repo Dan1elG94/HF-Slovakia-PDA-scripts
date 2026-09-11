@@ -33,6 +33,7 @@
 
     let drawingIndex = {};
 
+    // asi mozem vymazat
     function cleanExcelText(value) {
         if (value == null) return '';
         let str = String(value).trim();
@@ -52,14 +53,16 @@
             const orderNoRaw = row[COL_ORDER_NO];
             if (orderNoRaw === undefined || orderNoRaw === null || orderNoRaw === '') continue;
 
-            const key = cleanExcelText(orderNoRaw);
+            const key = String(orderNoRaw).trim();
             if (!key) continue;
 
             index[key] = {
-                drawingNo: cleanExcelText(row[COL_DRAWING_NO]),
-                version: cleanExcelText(row[COL_VERSION]),
+                drawingNo: row[COL_DRAWING_NO] != null ? String(row[COL_DRAWING_NO]).trim() : '',
+                version: row[COL_VERSION] != null ? String(row[COL_VERSION]).trim() : '',
             };
         }
+
+        console.log('[PDA drawing-button] ukazka prvych 5 klucov v indexe:', Object.keys(index).slice(0, 5));
 
         return index;
     }
@@ -152,7 +155,7 @@
     }
 
     function applyDrawingForCurrentOperation(current) {
-        const orderNoForLookup = (current.productionOrderNo || '').slice(2);
+        const orderNoForLookup = "'" + (current.productionOrderNo || '').slice(2);
         const drawing = findDrawingByOrderNo(orderNoForLookup);
 
         if (drawing) {
