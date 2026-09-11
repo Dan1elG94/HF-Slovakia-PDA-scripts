@@ -1,38 +1,115 @@
 // ==UserScript==
 // @name         PDA - Order drawing button
 // @namespace    http://tampermonkey.net/
-// @version      0.0.1
-// @description  Prida tlacidlo s odkazom na vykres zakazky do detailu objednavky
+// @version      0.0.2
+// @description  Nacita Excel s vykresmi zo sietoveho disku, sleduje aktualne otvorenu operaciu a zobrazuje cislo vykresu + verziu v tlacidle
 // @author       Gabris
 // @updateURL    https://github.com/Dan1elG94/HF-Slovakia-PDA-scripts/raw/refs/heads/main/order-drawing-button.user.js
 // @downloadURL  https://github.com/Dan1elG94/HF-Slovakia-PDA-scripts/raw/refs/heads/main/order-drawing-button.user.js
-// @match        https://hf.simplifier.cloud/*
+// @match        https://hf.simplifier.cloud/appDirect/PDA/
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=simplifier.cloud
 // @run-at       document-start
-// @grant        none
-
-
-
-// @grant        none
+// @grant        GM_xmlhttpRequest
+// @grant        unsafeWindow
+// @require      https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js
 // ==/UserScript==
 
 (function () {
     'use strict';
 
+    // ---------- Excel: nacitanie a vytvorenie indexu cislo zakazky -> vykres/verzia ----------
+
+    // UPRAV podla realnej cesty k suboru:
+    // - mapovany sietovy disk:      'file:///Z:/cesta/k/suboru/plan.xlsx'
+    // - UNC cesta (bez mapovania):  'file://server/share/plan.xlsx'
+    const EXCEL_FILE_URL = 'file:///C:/Users/Gabris/OneDrive - HF MIXING GROUP/HFSK O.4 Production - Data source/AutomatedOQ180.xlsx';
+
+    // nazov listu v Exceli - null = pouzije sa prvy list v subore
+    const SHEET_NAME = null;
+
+    const COL_ORDER_NO = 7;    // stlpec H
+    const COL_DRAWING_NO = 33; // stlpec AH
+    const COL_VERSION = 34;    // stlpec AI
+
+    let drawingIndex = {};
+
+    function buildDrawingIndex(rows) {
+        const index = {};
+
+        for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            if (!row) continue;
+
+            const orderNoRaw = row[COL_ORDER_NO];
+            if (orderNoRaw === undefined || orderNoRaw === null || orderNoRaw === '') continue;
+
+            const key = String(orderNoRaw).trim();
+            const drawingNoRaw = row[COL_DRAWING_NO];
+            const versionRaw = row[COL_VERSION];
+
+            index[key] = {
+                drawingNo: drawingNoRaw != null ? String(drawingNoRaw).trim() : '',
+                version: versionRaw != null ? String(versionRaw).trim() : '',
+            };
+        }
+
+        return index;
+    }
+
+    function loadExcel() {
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url: EXCEL_FILE_URL,
+            responseType: 'arraybuffer',
+            onload: function (response) {
+                try {
+                    const data = new Uint8Array(response.response);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = SHEET_NAME || workbook.SheetNames[0];
+                    const sheet = workbook.Sheets[sheetName];
+                    if (!sheet) {
+                        console.warn('[PDA drawing-button] list', sheetName, 'sa v exceli nenasiel');
+                        return;
+                    }
+
+                    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                    drawingIndex = buildDrawingIndex(rows);
+                    unsafeWindow.PDA_DRAWING_INDEX = drawingIndex;
+
+                    console.log('[PDA drawing-button] index vytvoreny, pocet zaznamov:', Object.keys(drawingIndex).length);
+
+                    if (unsafeWindow.PDA_CURRENT_OPERATION) {
+                        applyDrawingForCurrentOperation(unsafeWindow.PDA_CURRENT_OPERATION);
+                    }
+                } catch (e) {
+                    console.warn('[PDA drawing-button] chyba pri spracovani excelu', e);
+                }
+            },
+            onerror: function (err) {
+                console.warn('[PDA drawing-button] chyba pri nacitani suboru (skontroluj cestu a "Allow access to file URLs")', err);
+            },
+        });
+    }
+
+    function findDrawingByOrderNo(orderNo) {
+        return drawingIndex[orderNo] || null;
+    }
+    unsafeWindow.PDA_findDrawingByOrderNo = findDrawingByOrderNo;
+
     // ---------- XHR intercept: sledovanie aktualne otvorenej operacie ----------
     const TARGET_URL_SUBSTRING = '/client/1.0/executeBO';
 
-    window.PDA_CURRENT_OPERATION = window.PDA_CURRENT_OPERATION || null;
+    unsafeWindow.PDA_CURRENT_OPERATION = unsafeWindow.PDA_CURRENT_OPERATION || null;
 
-    const originalOpen = XMLHttpRequest.prototype.open;
-    const originalSend = XMLHttpRequest.prototype.send;
+    const originalOpen = unsafeWindow.XMLHttpRequest.prototype.open;
+    const originalSend = unsafeWindow.XMLHttpRequest.prototype.send;
 
-    XMLHttpRequest.prototype.open = function (method, url, ...rest) {
+    unsafeWindow.XMLHttpRequest.prototype.open = function (method, url, ...rest) {
         this._pdaDrawing_url = url;
         return originalOpen.call(this, method, url, ...rest);
     };
 
-    XMLHttpRequest.prototype.send = function (body) {
+    unsafeWindow.XMLHttpRequest.prototype.send = function (body) {
         const url = this._pdaDrawing_url || '';
 
         if (url.includes(TARGET_URL_SUBSTRING)) {
@@ -62,12 +139,13 @@
             material: operation.material,
         };
 
-        window.PDA_CURRENT_OPERATION = current;
+        unsafeWindow.PDA_CURRENT_OPERATION = current;
+        applyDrawingForCurrentOperation(current);
+    }
 
+    function applyDrawingForCurrentOperation(current) {
         const orderNoForLookup = (current.productionOrderNo || '').slice(2);
-        const drawing = typeof window.PDA_findDrawingByOrderNo === 'function'
-            ? window.PDA_findDrawingByOrderNo(orderNoForLookup)
-            : null;
+        const drawing = findDrawingByOrderNo(orderNoForLookup);
 
         if (drawing) {
             console.log('[PDA drawing-button] vykres pre zakazku', current.productionOrderNo, '->', drawing.drawingNo, '| verzia:', drawing.version);
@@ -162,13 +240,8 @@
         const wrapper = buildWrapper();
         container.insertBefore(wrapper, container.firstChild);
 
-        // ak uz mame zachytenu aktualnu operaciu (napr. znovunacitanie UI po prekresleni), rovno ju zobrazime
-        if (window.PDA_CURRENT_OPERATION) {
-            const orderNoForLookup = (window.PDA_CURRENT_OPERATION.productionOrderNo || '').slice(2);
-            const drawing = typeof window.PDA_findDrawingByOrderNo === 'function'
-                ? window.PDA_findDrawingByOrderNo(orderNoForLookup)
-                : null;
-            updateDrawingButtonDisplay(drawing);
+        if (unsafeWindow.PDA_CURRENT_OPERATION) {
+            applyDrawingForCurrentOperation(unsafeWindow.PDA_CURRENT_OPERATION);
         }
     }
 
@@ -186,4 +259,6 @@
         if (!document.getElementById(WRAPPER_ID)) scheduleEnsure();
     });
     observer.observe(document.body, { childList: true, subtree: true });
+
+    loadExcel();
 })();
