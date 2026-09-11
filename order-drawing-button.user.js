@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PDA - Order drawing button
 // @namespace    http://tampermonkey.net/
-// @version      0.0.5
+// @version      0.0.6
 // @description  Nacita Excel s vykresmi zo sietoveho disku, sleduje aktualne otvorenu operaciu a zobrazuje cislo vykresu + verziu v tlacidle
 // @author       Gabris
 // @updateURL    https://github.com/Dan1elG94/HF-Slovakia-PDA-scripts/raw/refs/heads/main/order-drawing-button.user.js
@@ -43,6 +43,7 @@
                 console.warn('[PDA drawing-button] saveHandle: put() zlyhal', putReq.error);
             };
             tx.oncomplete = () => {
+                console.log('[PDA drawing-button] saveHandle: transakcia uspesne dokoncena, handle by mal byt ulozeny');
                 resolve();
             };
             tx.onerror = () => {
@@ -57,11 +58,13 @@
     }
  
     async function loadHandle() {
+        console.log('[PDA drawing-button] loadHandle: hladam ulozeny handle v IndexedDB');
         const db = await openHandleDb();
         return new Promise((resolve, reject) => {
             const tx = db.transaction(STORE_NAME, 'readonly');
             const req = tx.objectStore(STORE_NAME).get(HANDLE_KEY);
             req.onsuccess = () => {
+                console.log('[PDA drawing-button] loadHandle: vysledok z IndexedDB =', req.result);
                 resolve(req.result || null);
             };
             req.onerror = () => {
@@ -100,6 +103,8 @@
                 version: row[COL_VERSION] != null ? String(row[COL_VERSION]).trim() : '',
             };
         }
+ 
+        console.log('[PDA drawing-button] ukazka prvych 5 klucov v indexe:', Object.keys(index).slice(0, 5));
         return index;
     }
  
@@ -119,6 +124,7 @@
         window.PDA_DRAWING_INDEX = drawingIndex;
         excelLoaded = true;
  
+        console.log('[PDA drawing-button] index vytvoreny, pocet zaznamov:', Object.keys(drawingIndex).length);
         updateLoadButtonState('loaded');
  
         if (window.PDA_CURRENT_OPERATION) {
@@ -158,6 +164,8 @@
     }
  
     async function tryAutoLoadFromStoredHandle() {
+        console.log('[PDA drawing-button] tryAutoLoadFromStoredHandle: start, supportsFsAccess =', supportsFsAccess);
+ 
         if (!supportsFsAccess) {
             updateLoadButtonState('unsupported');
             return;
@@ -176,9 +184,12 @@
             return;
         }
  
+        console.log('[PDA drawing-button] najdeny ulozeny handle:', handle, 'nazov suboru:', handle.name);
+ 
         let permission;
         try {
             permission = await handle.queryPermission({ mode: 'read' });
+            console.log('[PDA drawing-button] stav opravnenia (queryPermission) =', permission);
         } catch (err) {
             console.warn('[PDA drawing-button] chyba pri kontrole opravnenia', err);
             updateLoadButtonState('needs-permission', handle);
@@ -266,12 +277,21 @@
         const orderNoForLookup = "'" + (current.productionOrderNo || '').slice(2);
         const drawing = findDrawingByOrderNo(orderNoForLookup);
  
-        if (!drawing) {
+        if (drawing) {
+            console.log('[PDA drawing-button] vykres pre zakazku', current.productionOrderNo, '->', drawing.drawingNo, '| verzia:', drawing.version);
+        } else {
             console.log('[PDA drawing-button] vykres pre zakazku', current.productionOrderNo, '(hladane cislo', orderNoForLookup, ') sa v Exceli nenasiel');
         }
  
         updateDrawingButtonDisplay(drawing);
     }
+ 
+    function stripLeadingApostrophe(value) {
+        if (!value) return value;
+        return value.charAt(0) === "'" ? value.slice(1) : value;
+    }
+ 
+    let currentDrawingInfo = null; // { drawingNo, version } zobrazene na tlacidle, ocistene od uvodneho apostrofu
  
     function updateDrawingButtonDisplay(drawing) {
         const valueEl = document.getElementById('__pda_order_drawing_value__');
@@ -279,9 +299,16 @@
         if (!valueEl || !revisionEl) return;
  
         if (drawing) {
-            valueEl.textContent = drawing.drawingNo || '—';
-            revisionEl.textContent = drawing.version ? 'rev. ' + drawing.version : '';
+            const cleanDrawingNo = stripLeadingApostrophe(drawing.drawingNo) || '—';
+            const cleanVersion = stripLeadingApostrophe(drawing.version) || '';
+ 
+            currentDrawingInfo = { drawingNo: cleanDrawingNo, version: cleanVersion };
+ 
+            valueEl.textContent = cleanDrawingNo;
+            revisionEl.textContent = cleanVersion ? 'rev. ' + cleanVersion : '';
         } else {
+            currentDrawingInfo = null;
+ 
             valueEl.textContent = '—';
             revisionEl.textContent = '';
         }
@@ -336,6 +363,14 @@
         button.appendChild(label);
         button.appendChild(value);
         button.appendChild(revision);
+ 
+        button.addEventListener('click', () => {
+            if (currentDrawingInfo) {
+                console.log('Vykres c.: ' + currentDrawingInfo.drawingNo + ' rev.: ' + currentDrawingInfo.version);
+            } else {
+                console.log('[PDA drawing-button] pre aktualnu zakazku nie je znamy ziadny vykres');
+            }
+        });
  
         return button;
     }
