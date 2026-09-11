@@ -43,7 +43,6 @@
                 console.warn('[PDA drawing-button] saveHandle: put() zlyhal', putReq.error);
             };
             tx.oncomplete = () => {
-                console.log('[PDA drawing-button] saveHandle: transakcia uspesne dokoncena, handle by mal byt ulozeny');
                 resolve();
             };
             tx.onerror = () => {
@@ -58,13 +57,11 @@
     }
  
     async function loadHandle() {
-        console.log('[PDA drawing-button] loadHandle: hladam ulozeny handle v IndexedDB');
         const db = await openHandleDb();
         return new Promise((resolve, reject) => {
             const tx = db.transaction(STORE_NAME, 'readonly');
             const req = tx.objectStore(STORE_NAME).get(HANDLE_KEY);
             req.onsuccess = () => {
-                console.log('[PDA drawing-button] loadHandle: vysledok z IndexedDB =', req.result);
                 resolve(req.result || null);
             };
             req.onerror = () => {
@@ -103,8 +100,6 @@
                 version: row[COL_VERSION] != null ? String(row[COL_VERSION]).trim() : '',
             };
         }
- 
-        console.log('[PDA drawing-button] ukazka prvych 5 klucov v indexe:', Object.keys(index).slice(0, 5));
         return index;
     }
  
@@ -124,7 +119,6 @@
         window.PDA_DRAWING_INDEX = drawingIndex;
         excelLoaded = true;
  
-        console.log('[PDA drawing-button] index vytvoreny, pocet zaznamov:', Object.keys(drawingIndex).length);
         updateLoadButtonState('loaded');
  
         if (window.PDA_CURRENT_OPERATION) {
@@ -164,8 +158,6 @@
     }
  
     async function tryAutoLoadFromStoredHandle() {
-        console.log('[PDA drawing-button] tryAutoLoadFromStoredHandle: start, supportsFsAccess =', supportsFsAccess);
- 
         if (!supportsFsAccess) {
             updateLoadButtonState('unsupported');
             return;
@@ -184,12 +176,9 @@
             return;
         }
  
-        console.log('[PDA drawing-button] najdeny ulozeny handle:', handle, 'nazov suboru:', handle.name);
- 
         let permission;
         try {
             permission = await handle.queryPermission({ mode: 'read' });
-            console.log('[PDA drawing-button] stav opravnenia (queryPermission) =', permission);
         } catch (err) {
             console.warn('[PDA drawing-button] chyba pri kontrole opravnenia', err);
             updateLoadButtonState('needs-permission', handle);
@@ -277,9 +266,7 @@
         const orderNoForLookup = "'" + (current.productionOrderNo || '').slice(2);
         const drawing = findDrawingByOrderNo(orderNoForLookup);
  
-        if (drawing) {
-            console.log('[PDA drawing-button] vykres pre zakazku', current.productionOrderNo, '->', drawing.drawingNo, '| verzia:', drawing.version);
-        } else {
+        if (!drawing) {
             console.log('[PDA drawing-button] vykres pre zakazku', current.productionOrderNo, '(hladane cislo', orderNoForLookup, ') sa v Exceli nenasiel');
         }
  
@@ -392,12 +379,15 @@
     }
  
     function renderLoadButtonState(loadButton, state) {
+        // po uspesnom nacitani sa tlacidlo uplne skryje - je to poistka, aby nikto omylom neklikal
+        // na vyber/zmenu suboru; zmena suboru je zamerne mozna len manualne cez DevTools (vymazanie IndexedDB)
+        if (state === 'loaded') {
+            loadButton.style.display = 'none';
+            return;
+        }
+        loadButton.style.display = '';
+ 
         switch (state) {
-            case 'loaded':
-                loadButton.textContent = 'Excel načítaný ✓';
-                loadButton.style.backgroundColor = '#e6f4ea';
-                loadButton.style.borderColor = '#34a853';
-                break;
             case 'loading':
                 loadButton.textContent = 'Načítavam…';
                 loadButton.style.backgroundColor = '#f5f5f5';
