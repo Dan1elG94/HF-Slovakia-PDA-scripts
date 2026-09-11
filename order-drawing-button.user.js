@@ -9,39 +9,23 @@
 // @match        https://hf.simplifier.cloud/appDirect/PDA/
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=simplifier.cloud
 // @run-at       document-start
-// @grant        GM_xmlhttpRequest
-// @grant        unsafeWindow
+// @grant        none
 // @require      https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js
 // ==/UserScript==
 
 (function () {
     'use strict';
 
-    // ---------- Excel: nacitanie a vytvorenie indexu cislo zakazky -> vykres/verzia ----------
+    // ---------- Excel: manualny vyber suboru a vytvorenie indexu cislo zakazky -> vykres/verzia ----------
 
-    // UPRAV podla realnej cesty k suboru:
-    // - mapovany sietovy disk:      'file:///Z:/cesta/k/suboru/plan.xlsx'
-    // - UNC cesta (bez mapovania):  'file://server/share/plan.xlsx'
-    const EXCEL_FILE_URL = 'file:///C:/Users/Gabris/OneDrive - HF MIXING GROUP/HFSK O.4 Production - Data source/AutomatedOQ180.xlsx';
-
-    // nazov listu v Exceli - null = pouzije sa prvy list v subore
-    const SHEET_NAME = null;
+    const SHEET_NAME = null; // null = prvy list v subore
 
     const COL_ORDER_NO = 7;    // stlpec H
     const COL_DRAWING_NO = 33; // stlpec AH
     const COL_VERSION = 34;    // stlpec AI
 
     let drawingIndex = {};
-
-    // asi mozem vymazat
-    function cleanExcelText(value) {
-        if (value == null) return '';
-        let str = String(value).trim();
-        if (str.startsWith("'")) {
-            str = str.slice(1);
-        }
-        return str;
-    }
+    let excelLoaded = false;
 
     function buildDrawingIndex(rows) {
         const index = {};
@@ -63,64 +47,62 @@
         }
 
         console.log('[PDA drawing-button] ukazka prvych 5 klucov v indexe:', Object.keys(index).slice(0, 5));
-
         return index;
     }
 
-    function loadExcel() {
-        GM_xmlhttpRequest({
-            method: 'GET',
-            url: EXCEL_FILE_URL,
-            responseType: 'arraybuffer',
-            onload: function (response) {
-                try {
-                    const data = new Uint8Array(response.response);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const sheetName = SHEET_NAME || workbook.SheetNames[0];
-                    const sheet = workbook.Sheets[sheetName];
-                    if (!sheet) {
-                        console.warn('[PDA drawing-button] list', sheetName, 'sa v exceli nenasiel');
-                        return;
-                    }
-
-                    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-                    drawingIndex = buildDrawingIndex(rows);
-                    unsafeWindow.PDA_DRAWING_INDEX = drawingIndex;
-
-                    console.log('[PDA drawing-button] index vytvoreny, pocet zaznamov:', Object.keys(drawingIndex).length);
-
-                    if (unsafeWindow.PDA_CURRENT_OPERATION) {
-                        applyDrawingForCurrentOperation(unsafeWindow.PDA_CURRENT_OPERATION);
-                    }
-                } catch (e) {
-                    console.warn('[PDA drawing-button] chyba pri spracovani excelu', e);
+    function handleExcelFile(file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheetName = SHEET_NAME || workbook.SheetNames[0];
+                const sheet = workbook.Sheets[sheetName];
+                if (!sheet) {
+                    console.warn('[PDA drawing-button] list', sheetName, 'sa v exceli nenasiel');
+                    return;
                 }
-            },
-            onerror: function (err) {
-                console.warn('[PDA drawing-button] chyba pri nacitani suboru (skontroluj cestu a "Allow access to file URLs")', err);
-            },
-        });
+
+                const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                drawingIndex = buildDrawingIndex(rows);
+                window.PDA_DRAWING_INDEX = drawingIndex;
+                excelLoaded = true;
+
+                console.log('[PDA drawing-button] index vytvoreny, pocet zaznamov:', Object.keys(drawingIndex).length);
+                updateLoadButtonState();
+
+                if (window.PDA_CURRENT_OPERATION) {
+                    applyDrawingForCurrentOperation(window.PDA_CURRENT_OPERATION);
+                }
+            } catch (err) {
+                console.warn('[PDA drawing-button] chyba pri spracovani excelu', err);
+            }
+        };
+        reader.onerror = function (err) {
+            console.warn('[PDA drawing-button] chyba pri citani suboru', err);
+        };
+        reader.readAsArrayBuffer(file);
     }
 
     function findDrawingByOrderNo(orderNo) {
         return drawingIndex[orderNo] || null;
     }
-    unsafeWindow.PDA_findDrawingByOrderNo = findDrawingByOrderNo;
+    window.PDA_findDrawingByOrderNo = findDrawingByOrderNo;
 
     // ---------- XHR intercept: sledovanie aktualne otvorenej operacie ----------
     const TARGET_URL_SUBSTRING = '/client/1.0/executeBO';
 
-    unsafeWindow.PDA_CURRENT_OPERATION = unsafeWindow.PDA_CURRENT_OPERATION || null;
+    window.PDA_CURRENT_OPERATION = window.PDA_CURRENT_OPERATION || null;
 
-    const originalOpen = unsafeWindow.XMLHttpRequest.prototype.open;
-    const originalSend = unsafeWindow.XMLHttpRequest.prototype.send;
+    const originalOpen = XMLHttpRequest.prototype.open;
+    const originalSend = XMLHttpRequest.prototype.send;
 
-    unsafeWindow.XMLHttpRequest.prototype.open = function (method, url, ...rest) {
+    XMLHttpRequest.prototype.open = function (method, url, ...rest) {
         this._pdaDrawing_url = url;
         return originalOpen.call(this, method, url, ...rest);
     };
 
-    unsafeWindow.XMLHttpRequest.prototype.send = function (body) {
+    XMLHttpRequest.prototype.send = function (body) {
         const url = this._pdaDrawing_url || '';
 
         if (url.includes(TARGET_URL_SUBSTRING)) {
@@ -150,7 +132,7 @@
             material: operation.material,
         };
 
-        unsafeWindow.PDA_CURRENT_OPERATION = current;
+        window.PDA_CURRENT_OPERATION = current;
         applyDrawingForCurrentOperation(current);
     }
 
@@ -181,10 +163,12 @@
         }
     }
 
-    // ---------- Vykreslenie tlacidla ----------
+    // ---------- Vykreslenie tlacidla + file picker ----------
     const CONTAINER_ID = 'WorkcenterDetail--Order_FlexBox';
     const WRAPPER_ID = '__pda_order_drawing_wrapper__';
     const BUTTON_ID = '__pda_order_drawing_button__';
+    const LOAD_BUTTON_ID = '__pda_order_drawing_load_button__';
+    const FILE_INPUT_ID = '__pda_order_drawing_file_input__';
 
     function buildButton() {
         const button = document.createElement('button');
@@ -230,20 +214,79 @@
         return button;
     }
 
+    function buildLoadButton() {
+        const loadButton = document.createElement('button');
+        loadButton.id = LOAD_BUTTON_ID;
+        loadButton.type = 'button';
+        loadButton.textContent = 'Načítať Excel';
+
+        loadButton.style.padding = '6px 10px';
+        loadButton.style.border = '1px solid #cccccc';
+        loadButton.style.borderRadius = '6px';
+        loadButton.style.backgroundColor = '#f5f5f5';
+        loadButton.style.cursor = 'pointer';
+        loadButton.style.fontSize = '0.75rem';
+        loadButton.style.marginRight = '8px';
+        loadButton.style.alignSelf = 'center';
+
+        loadButton.addEventListener('click', () => {
+            const fileInput = document.getElementById(FILE_INPUT_ID);
+            if (fileInput) fileInput.click();
+        });
+
+        return loadButton;
+    }
+
+    function updateLoadButtonState() {
+        const loadButton = document.getElementById(LOAD_BUTTON_ID);
+        if (!loadButton) return;
+
+        if (excelLoaded) {
+            loadButton.textContent = 'Excel načítaný ✓';
+            loadButton.style.backgroundColor = '#e6f4ea';
+            loadButton.style.borderColor = '#34a853';
+        } else {
+            loadButton.textContent = 'Načítať Excel';
+            loadButton.style.backgroundColor = '#f5f5f5';
+            loadButton.style.borderColor = '#cccccc';
+        }
+    }
+
+    function ensureFileInput() {
+        if (document.getElementById(FILE_INPUT_ID)) return;
+
+        const fileInput = document.createElement('input');
+        fileInput.id = FILE_INPUT_ID;
+        fileInput.type = 'file';
+        fileInput.accept = '.xlsx,.xls';
+        fileInput.style.display = 'none';
+
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files && fileInput.files[0];
+            if (file) handleExcelFile(file);
+        });
+
+        document.body.appendChild(fileInput);
+    }
+
     function buildWrapper() {
         const wrapper = document.createElement('div');
         wrapper.id = WRAPPER_ID;
         wrapper.style.display = 'flex';
         wrapper.style.justifyContent = 'flex-end';
+        wrapper.style.alignItems = 'center';
         wrapper.style.width = '100%';
         wrapper.style.boxSizing = 'border-box';
         wrapper.style.marginBottom = '8px';
 
+        wrapper.appendChild(buildLoadButton());
         wrapper.appendChild(buildButton());
         return wrapper;
     }
 
     function ensureButton() {
+        ensureFileInput();
+
         const container = document.getElementById(CONTAINER_ID);
         if (!container) return;
         if (document.getElementById(WRAPPER_ID)) return;
@@ -251,8 +294,10 @@
         const wrapper = buildWrapper();
         container.insertBefore(wrapper, container.firstChild);
 
-        if (unsafeWindow.PDA_CURRENT_OPERATION) {
-            applyDrawingForCurrentOperation(unsafeWindow.PDA_CURRENT_OPERATION);
+        updateLoadButtonState();
+
+        if (window.PDA_CURRENT_OPERATION) {
+            applyDrawingForCurrentOperation(window.PDA_CURRENT_OPERATION);
         }
     }
 
@@ -270,6 +315,4 @@
         if (!document.getElementById(WRAPPER_ID)) scheduleEnsure();
     });
     observer.observe(document.body, { childList: true, subtree: true });
-
-    loadExcel();
 })();
