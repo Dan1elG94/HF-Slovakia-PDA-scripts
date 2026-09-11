@@ -277,12 +277,6 @@
         const orderNoForLookup = "'" + (current.productionOrderNo || '').slice(2);
         const drawing = findDrawingByOrderNo(orderNoForLookup);
  
-        if (drawing) {
-            console.log('[PDA drawing-button] vykres pre zakazku', current.productionOrderNo, '->', drawing.drawingNo, '| verzia:', drawing.version);
-        } else {
-            console.log('[PDA drawing-button] vykres pre zakazku', current.productionOrderNo, '(hladane cislo', orderNoForLookup, ') sa v Exceli nenasiel');
-        }
- 
         updateDrawingButtonDisplay(drawing);
     }
  
