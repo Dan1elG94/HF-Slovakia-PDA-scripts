@@ -9,7 +9,9 @@
 // @match        https://hf.simplifier.cloud/appDirect/PDA/
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=simplifier.cloud
 // @run-at       document-start
-// @grant        none
+// @grant        GM_xmlhttpRequest
+// @grant        unsafeWindow
+// @connect      172.16.77.134
 // @require      https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js
 // ==/UserScript==
  
@@ -29,7 +31,7 @@
  
     function openHandleDb() {
         return new Promise((resolve, reject) => {
-            const req = indexedDB.open(DB_NAME, 1);
+            const req = unsafeWindow.indexedDB.open(DB_NAME, 1);
             req.onupgradeneeded = () => {
                 req.result.createObjectStore(STORE_NAME);
             };
@@ -126,14 +128,14 @@
  
         const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
         drawingIndex = buildDrawingIndex(rows);
-        window.PDA_DRAWING_INDEX = drawingIndex;
+        unsafeWindow.PDA_DRAWING_INDEX = drawingIndex;
         excelLoaded = true;
  
         console.log('[PDA drawing-button] index vytvoreny, pocet zaznamov:', Object.keys(drawingIndex).length);
         updateLoadButtonState('loaded');
  
-        if (window.PDA_CURRENT_OPERATION) {
-            applyDrawingForCurrentOperation(window.PDA_CURRENT_OPERATION);
+        if (unsafeWindow.PDA_CURRENT_OPERATION) {
+            applyDrawingForCurrentOperation(unsafeWindow.PDA_CURRENT_OPERATION);
         }
     }
  
@@ -145,15 +147,15 @@
     function findDrawingByOrderNo(orderNo) {
         return drawingIndex[orderNo] || null;
     }
-    window.PDA_findDrawingByOrderNo = findDrawingByOrderNo;
+    unsafeWindow.PDA_findDrawingByOrderNo = findDrawingByOrderNo;
  
     // ---------- Vyber a znovupouzitie suboru cez File System Access API ----------
  
-    const supportsFsAccess = typeof window.showOpenFilePicker === 'function';
+    const supportsFsAccess = typeof unsafeWindow.showOpenFilePicker === 'function';
  
     async function pickFileAndRemember() {
         try {
-            const [handle] = await window.showOpenFilePicker({
+            const [handle] = await unsafeWindow.showOpenFilePicker({
                 types: [{ description: 'Excel', accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'], 'application/vnd.ms-excel': ['.xls'] } }],
                 excludeAcceptAllOption: false,
                 multiple: false,
@@ -234,17 +236,17 @@
     // ---------- XHR intercept: sledovanie aktualne otvorenej operacie ----------
     const TARGET_URL_SUBSTRING = '/client/1.0/executeBO';
  
-    window.PDA_CURRENT_OPERATION = window.PDA_CURRENT_OPERATION || null;
+    unsafeWindow.PDA_CURRENT_OPERATION = unsafeWindow.PDA_CURRENT_OPERATION || null;
  
-    const originalOpen = XMLHttpRequest.prototype.open;
-    const originalSend = XMLHttpRequest.prototype.send;
+    const originalOpen = unsafeWindow.XMLHttpRequest.prototype.open;
+    const originalSend = unsafeWindow.XMLHttpRequest.prototype.send;
  
-    XMLHttpRequest.prototype.open = function (method, url, ...rest) {
+    unsafeWindow.XMLHttpRequest.prototype.open = function (method, url, ...rest) {
         this._pdaDrawing_url = url;
         return originalOpen.call(this, method, url, ...rest);
     };
  
-    XMLHttpRequest.prototype.send = function (body) {
+    unsafeWindow.XMLHttpRequest.prototype.send = function (body) {
         const url = this._pdaDrawing_url || '';
  
         if (url.includes(TARGET_URL_SUBSTRING)) {
@@ -274,7 +276,7 @@
             material: operation.material,
         };
  
-        window.PDA_CURRENT_OPERATION = current;
+        unsafeWindow.PDA_CURRENT_OPERATION = current;
         applyDrawingForCurrentOperation(current);
     }
  
@@ -315,15 +317,32 @@
  
     // ---------- Sluzba "Mapa vykresov" (PDM) - hladanie a modalne okno so zoznamom ----------
  
-    async function pdmHladaj(cislo) {
-        const params = new URLSearchParams({ q: cislo });
-        const response = await fetch(`${PDM_BASE}/search?${params}`, {
-            headers: PDM_KEY ? { 'X-API-Key': PDM_KEY } : {},
+    function pdmHladaj(cislo) {
+        return new Promise((resolve, reject) => {
+            const params = new URLSearchParams({ q: cislo });
+            GM_xmlhttpRequest({
+                method: 'GET',
+                url: `${PDM_BASE}/search?${params}`,
+                headers: PDM_KEY ? { 'X-API-Key': PDM_KEY } : {},
+                onload: function (response) {
+                    if (response.status < 200 || response.status >= 300) {
+                        reject(new Error(`Sluzba vykresov vratila HTTP ${response.status}`));
+                        return;
+                    }
+                    try {
+                        resolve(JSON.parse(response.responseText));
+                    } catch (e) {
+                        reject(new Error('Neplatna odpoved zo sluzby vykresov'));
+                    }
+                },
+                onerror: function () {
+                    reject(new Error('Sluzba vykresov neodpovedala (chyba spojenia)'));
+                },
+                ontimeout: function () {
+                    reject(new Error('Sluzba vykresov neodpovedala vcas (timeout)'));
+                },
+            });
         });
-        if (!response.ok) {
-            throw new Error(`Sluzba vykresov vratila HTTP ${response.status}`);
-        }
-        return response.json();
     }
  
     function pdmOtvorOkno(cislo) {
@@ -400,7 +419,7 @@
  
                 telo.querySelectorAll('tr[data-id]').forEach((tr) => {
                     tr.addEventListener('click', () => {
-                        window.open(`${PDM_BASE}/file/${tr.dataset.id}`, '_blank');
+                        unsafeWindow.open(`${PDM_BASE}/file/${tr.dataset.id}`, '_blank');
                     });
                 });
             })
@@ -576,8 +595,8 @@
             renderLoadButtonState(loadButton, currentLoadState);
         }
  
-        if (window.PDA_CURRENT_OPERATION) {
-            applyDrawingForCurrentOperation(window.PDA_CURRENT_OPERATION);
+        if (unsafeWindow.PDA_CURRENT_OPERATION) {
+            applyDrawingForCurrentOperation(unsafeWindow.PDA_CURRENT_OPERATION);
         }
     }
  
