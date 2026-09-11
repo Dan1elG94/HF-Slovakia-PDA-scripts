@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PDA - Order drawing button
 // @namespace    http://tampermonkey.net/
-// @version      0.0.6
+// @version      0.0.7
 // @description  Nacita Excel s vykresmi zo sietoveho disku, sleduje aktualne otvorenu operaciu a zobrazuje cislo vykresu + verziu v tlacidle
 // @author       Gabris
 // @updateURL    https://github.com/Dan1elG94/HF-Slovakia-PDA-scripts/raw/refs/heads/main/order-drawing-button.user.js
@@ -15,6 +15,11 @@
  
 (function () {
     'use strict';
+ 
+    // ---------- Sluzba "Mapa vykresov" (PDM) - konfiguracia ----------
+    // Adresu a API kluc nastav tu, podla dokumentacie sluzby.
+    const PDM_BASE = 'http://172.16.77.134:9000';
+    const PDM_KEY = ''; // ak sluzba vyzaduje X-API-Key, doplň ho sem
  
     // ---------- IndexedDB: ulozenie file handle-u, aby prezil aj refresh stranky ----------
  
@@ -308,6 +313,103 @@
         }
     }
  
+    // ---------- Sluzba "Mapa vykresov" (PDM) - hladanie a modalne okno so zoznamom ----------
+ 
+    async function pdmHladaj(cislo) {
+        const params = new URLSearchParams({ q: cislo });
+        const response = await fetch(`${PDM_BASE}/search?${params}`, {
+            headers: PDM_KEY ? { 'X-API-Key': PDM_KEY } : {},
+        });
+        if (!response.ok) {
+            throw new Error(`Sluzba vykresov vratila HTTP ${response.status}`);
+        }
+        return response.json();
+    }
+ 
+    function pdmOtvorOkno(cislo) {
+        const overlay = document.createElement('div');
+        overlay.id = '__pda_pdm_overlay__';
+        overlay.style.cssText =
+            'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99999;' +
+            'display:flex;align-items:center;justify-content:center;font-family:inherit;';
+ 
+        overlay.innerHTML = `
+            <div style="background:#ffffff;border-radius:10px;max-width:900px;width:92%;max-height:80vh;
+                        display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.3)">
+                <div style="display:flex;justify-content:space-between;align-items:center;
+                            padding:12px 16px;background:#5b9bd5;color:#ffffff">
+                    <b>Výkresy — ${cislo}</b>
+                    <button data-pda-zavrit type="button"
+                            style="background:none;border:0;color:#ffffff;font-size:22px;line-height:1;cursor:pointer">×</button>
+                </div>
+                <div data-pda-telo style="padding:14px 16px;overflow:auto">Hľadám…</div>
+            </div>`;
+ 
+        const zavri = () => {
+            overlay.remove();
+            document.removeEventListener('keydown', naEsc);
+        };
+        const naEsc = (e) => {
+            if (e.key === 'Escape') zavri();
+        };
+ 
+        overlay.querySelector('[data-pda-zavrit]').addEventListener('click', zavri);
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) zavri();
+        });
+        document.addEventListener('keydown', naEsc);
+        document.body.appendChild(overlay);
+ 
+        const telo = overlay.querySelector('[data-pda-telo]');
+ 
+        pdmHladaj(cislo)
+            .then((d) => {
+                if (!d.pocet) {
+                    telo.innerHTML = `<p>Pre <b>${cislo}</b> sa nenašiel žiadny PDF ani TIFF výkres.</p>`;
+                    return;
+                }
+ 
+                telo.innerHTML = `
+                    <table style="width:100%;border-collapse:collapse;font-size:14px">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left;padding:6px;border-bottom:2px solid #5b9bd5">Názov</th>
+                                <th style="text-align:left;padding:6px;border-bottom:2px solid #5b9bd5">Revízia</th>
+                                <th style="text-align:left;padding:6px;border-bottom:2px solid #5b9bd5">Stav</th>
+                                <th style="text-align:left;padding:6px;border-bottom:2px solid #5b9bd5">Ver.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${d.vysledky
+                                .map(
+                                    (v) => `
+                                <tr data-id="${v.id}" style="cursor:pointer;background:${v.zhoda_revizie === true ? '#e6f4ea' : 'transparent'}">
+                                    <td style="padding:6px;border-bottom:1px solid #eeeeee"><b>${v.nazov}</b></td>
+                                    <td style="padding:6px;border-bottom:1px solid #eeeeee">${v.revizia || ''}</td>
+                                    <td style="padding:6px;border-bottom:1px solid #eeeeee">${v.stav || ''}</td>
+                                    <td style="padding:6px;border-bottom:1px solid #eeeeee">${v.verzia != null ? v.verzia : ''}</td>
+                                </tr>`
+                                )
+                                .join('')}
+                        </tbody>
+                    </table>
+                    <p style="color:#777777;font-size:12px;margin-top:10px">
+                        ${d.pocet} výkresov · ${d.zdroj === 'mapa' ? 'z dennej mapy' : 'naživo z PDM'}
+                        ${d.mapa_z ? ' (' + d.mapa_z + ')' : ''} · kliknutím sa výkres otvorí
+                    </p>`;
+ 
+                telo.querySelectorAll('tr[data-id]').forEach((tr) => {
+                    tr.addEventListener('click', () => {
+                        window.open(`${PDM_BASE}/file/${tr.dataset.id}`, '_blank');
+                    });
+                });
+            })
+            .catch((err) => {
+                console.warn('[PDA drawing-button] chyba pri hladani vykresov', err);
+                telo.innerHTML = `<p style="color:#b00000">Služba výkresov neodpovedala.<br>${err.message}</p>`;
+            });
+    }
+ 
     // ---------- Vykreslenie tlacidla + tlacidlo na (opatovny) vyber/potvrdenie suboru ----------
     const CONTAINER_ID = 'WorkcenterDetail--Order_FlexBox';
     const WRAPPER_ID = '__pda_order_drawing_wrapper__';
@@ -359,8 +461,8 @@
         button.appendChild(revision);
  
         button.addEventListener('click', () => {
-            if (currentDrawingInfo) {
-                console.log('Vykres c.: ' + currentDrawingInfo.drawingNo + ' rev.: ' + currentDrawingInfo.version);
+            if (currentDrawingInfo && currentDrawingInfo.drawingNo) {
+                pdmOtvorOkno(currentDrawingInfo.drawingNo);
             } else {
                 console.log('[PDA drawing-button] pre aktualnu zakazku nie je znamy ziadny vykres');
             }
