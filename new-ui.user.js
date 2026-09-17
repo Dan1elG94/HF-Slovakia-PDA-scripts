@@ -4605,7 +4605,7 @@ body.${BODY_CLASS} { padding-bottom:34px !important; box-sizing:border-box; }
 #Main--Bar_Header {
     background-color: #ffffff !important;
     padding-top: 8px !important;
-    padding-bottom: 8px !important;
+    padding-bottom: 0 !important;
     box-sizing: border-box !important;
     min-height: 66px !important;
     position: relative !important;
