@@ -4599,7 +4599,7 @@ body.${BODY_CLASS} { padding-bottom:34px !important; box-sizing:border-box; }
 .nd-topbar [id$="Button_Logout"] .sapMBtnContent, .nd-topbar [id$="Button_Logout"] bdi,
 .nd-topbar [id$="Button_Logout"] .sapUiIcon { color:#fff !important; }
 #Main--MainPage > header.sapMPageHeader {
-    min-height: 66px !important;
+    min-height: 54px !important;
     position: relative !important;
 }
 #Main--Bar_Header {
@@ -4607,16 +4607,16 @@ body.${BODY_CLASS} { padding-bottom:34px !important; box-sizing:border-box; }
     padding-top: 8px !important;
     padding-bottom: 0 !important;
     box-sizing: border-box !important;
-    min-height: 66px !important;
+    min-height: 54px !important;
     position: relative !important;
 }
 #Main--Bar_Header-BarRight {
     padding-right: 16px !important;
     box-sizing: border-box !important;
 }
-/* header narastol z povodnych 44px na 66px */
+/* header narastol z povodnych 44px na 54px */
 #Main--MainPage-cont {
-    top: 66px !important;
+    top: 54px !important;
 }
 #Main--Hour_Date_Title {
     margin-bottom: 0 !important;
