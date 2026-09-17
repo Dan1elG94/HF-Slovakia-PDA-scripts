@@ -4601,6 +4601,10 @@ body.${BODY_CLASS} { padding-bottom:34px !important; box-sizing:border-box; }
 #Main--MainPage > header.sapMPageHeader {
     height: auto !important;
     min-height: auto !important;
+    max-height: none !important;
+    flex: 0 0 auto !important;
+    flex-basis: auto !important;
+    overflow: visible !important;
 }
 #Main--Bar_Header {
     background-color: #ffffff !important;
@@ -4609,10 +4613,16 @@ body.${BODY_CLASS} { padding-bottom:34px !important; box-sizing:border-box; }
     box-sizing: border-box !important;
     height: auto !important;
     min-height: auto !important;
+    max-height: none !important;
+    flex: 0 0 auto !important;
+    flex-basis: auto !important;
+    overflow: visible !important;
 }
 #Main--Bar_Header-BarLeft,
 #Main--Bar_Header-BarRight {
     height: auto !important;
+    max-height: none !important;
+    align-items: center !important;
 }
 #Main--Bar_Header-BarRight .sapMBtnInner {
     display: flex !important;
