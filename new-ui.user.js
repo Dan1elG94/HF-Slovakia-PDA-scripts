@@ -1,11 +1,11 @@
 // ==UserScript==
-// @name         PDA Suite NEW Design (HF Slovakia)
+// @name         PDA Suite NEW UI (HF Slovakia - D)
 // @namespace    http://tampermonkey.net/pda-new-design
 // @version      2.2.0
 // @description  NOVY DIZAJN PDA - samostatna vetva vyvoja. Instaluje sa vedla povodneho skriptu, v Tampermonkey nechaj zapnuty vzdy len JEDEN z nich.
 // @author       Gabris, Tvarozek
-// @updateURL    https://github.com/JaroTvarozek/PDA-D_J-NEW/raw/refs/heads/main/ver.2/new-design.user.js
-// @downloadURL  https://github.com/JaroTvarozek/PDA-D_J-NEW/raw/refs/heads/main/ver.2/new-design.user.js
+// @updateURL    https://github.com/Dan1elG94/HF-Slovakia-PDA-scripts/raw/refs/heads/main/new-ui.user.js
+// @downloadURL  https://github.com/Dan1elG94/HF-Slovakia-PDA-scripts/raw/refs/heads/main/new-ui.user.js
 // @match        https://hf.simplifier.cloud/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=simplifier.cloud
 // @run-at       document-start
