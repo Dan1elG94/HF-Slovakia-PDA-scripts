@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         PDA - Color and reorder buttons
 // @namespace    http://tampermonkey.net/
-// @version      1.0.0
-// @description  Color and reorder status buttons
+// @version      2.0.0
+// @description  Reorder status buttons (visual styling moved to new-ui.user.js)
 // @author       Gabris
 // @updateURL    https://github.com/Dan1elG94/HF-Slovakia-PDA-scripts/raw/refs/heads/main/color-and-reorder-buttons.user.js
 // @downloadURL  https://github.com/Dan1elG94/HF-Slovakia-PDA-scripts/raw/refs/heads/main/color-and-reorder-buttons.user.js
@@ -14,15 +14,11 @@
 (function () {
   'use strict';
 
+  // POZNAMKA: farbenie tlacidiel (styleButton) bolo presunute do new-ui.user.js,
+  // aby vsetka vizualna stylizacia stranky sedela na jednom mieste.
+  // Tento skript uz iba prerada tlacidla podla priority stavu.
+
   const CONTAINER_ID = 'WorkcenterDetail--Order_Status_Flexbox';
-
-  const COLORS = {
-    productive: '#4e9041',
-    downtime: '#d66c37',
-    fault: '#d04040',
-  };
-
-  const BORDER_RADIUS = '10px';
 
   const PRIORITY = { productive: 0, downtime: 1, fault: 2 };
 
@@ -40,20 +36,6 @@
   function textOf(btn) {
     const el = btn.querySelector('.sapMBtnContent bdi, .sapMBtnContent');
     return el ? el.textContent.trim() : '';
-  }
-
-  function styleButton(btn) {
-    const inner = btn.querySelector('.sapMBtnInner');
-    [btn, inner].forEach((el) => el && el.style.setProperty('border-radius', BORDER_RADIUS, 'important'));
-
-    const category = STATUS_MAP[textOf(btn)];
-    if (!category) return;
-    const color = COLORS[category];
-    [btn, inner].forEach((el) => {
-      if (!el) return;
-      el.style.setProperty('background-color', color, 'important');
-      el.style.setProperty('border-color', color, 'important');
-    });
   }
 
   function getButtons() {
@@ -77,7 +59,6 @@
 
   function updateAll() {
     const { container, buttons } = getButtons();
-    buttons.forEach(styleButton);
     reorderButtons(container, buttons);
   }
 

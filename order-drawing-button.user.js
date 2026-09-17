@@ -1,34 +1,31 @@
 // ==UserScript==
 // @name         PDA - Order drawing button
 // @namespace    http://tampermonkey.net/
-// @version      0.0.7
-// @description  Nacita Excel s vykresmi zo sietoveho disku, sleduje aktualne otvorenu operaciu a zobrazuje cislo vykresu + verziu v tlacidle
+// @version      8.0.0
+// @description  Excel s vykresmi vybrany raz cez File System Access API (handle v IndexedDB), sleduje aktualne otvorenu operaciu, zobrazuje cislo vykresu + verziu, klik na tlacidlo otvori zoznam vykresov zo sluzby Mapa vykresov (PDM) cez GM_xmlhttpRequest (obchadza CORS)
 // @author       Gabris
-// @updateURL    https://github.com/Dan1elG94/HF-Slovakia-PDA-scripts/raw/refs/heads/main/order-drawing-button.user.js
-// @downloadURL  https://github.com/Dan1elG94/HF-Slovakia-PDA-scripts/raw/refs/heads/main/order-drawing-button.user.js
 // @match        https://hf.simplifier.cloud/appDirect/PDA/
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=simplifier.cloud
 // @run-at       document-start
 // @grant        GM_xmlhttpRequest
 // @grant        unsafeWindow
 // @connect      172.16.77.134
 // @require      https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js
 // ==/UserScript==
- 
+
 (function () {
     'use strict';
- 
+
     // ---------- Sluzba "Mapa vykresov" (PDM) - konfiguracia ----------
     // Adresu a API kluc nastav tu, podla dokumentacie sluzby.
     const PDM_BASE = 'http://172.16.77.134:9000';
     const PDM_KEY = ''; // ak sluzba vyzaduje X-API-Key, doplň ho sem
- 
+
     // ---------- IndexedDB: ulozenie file handle-u, aby prezil aj refresh stranky ----------
- 
+
     const DB_NAME = 'pda_drawing_db';
     const STORE_NAME = 'handles';
     const HANDLE_KEY = 'excel_file_handle';
- 
+
     function openHandleDb() {
         return new Promise((resolve, reject) => {
             const req = unsafeWindow.indexedDB.open(DB_NAME, 1);
@@ -39,7 +36,7 @@
             req.onerror = () => reject(req.error);
         });
     }
- 
+
     async function saveHandle(handle) {
         console.log('[PDA drawing-button] saveHandle: zacinam ukladat handle', handle);
         const db = await openHandleDb();
@@ -63,7 +60,7 @@
             };
         });
     }
- 
+
     async function loadHandle() {
         console.log('[PDA drawing-button] loadHandle: hladam ulozeny handle v IndexedDB');
         const db = await openHandleDb();
@@ -80,41 +77,41 @@
             };
         });
     }
- 
+
     // ---------- Excel: parsovanie a vytvorenie indexu cislo zakazky -> vykres/verzia ----------
- 
+
     const SHEET_NAME = null; // null = prvy list v subore
- 
+
     const COL_ORDER_NO = 7;    // stlpec H
     const COL_DRAWING_NO = 33; // stlpec AH
     const COL_VERSION = 34;    // stlpec AI
- 
+
     let drawingIndex = {};
     let excelLoaded = false;
- 
+
     function buildDrawingIndex(rows) {
         const index = {};
- 
+
         for (let i = 1; i < rows.length; i++) {
             const row = rows[i];
             if (!row) continue;
- 
+
             const orderNoRaw = row[COL_ORDER_NO];
             if (orderNoRaw === undefined || orderNoRaw === null || orderNoRaw === '') continue;
- 
+
             const key = String(orderNoRaw).trim();
             if (!key) continue;
- 
+
             index[key] = {
                 drawingNo: row[COL_DRAWING_NO] != null ? String(row[COL_DRAWING_NO]).trim() : '',
                 version: row[COL_VERSION] != null ? String(row[COL_VERSION]).trim() : '',
             };
         }
- 
+
         console.log('[PDA drawing-button] ukazka prvych 5 klucov v indexe:', Object.keys(index).slice(0, 5));
         return index;
     }
- 
+
     async function loadExcelFromFile(file) {
         const buffer = await file.arrayBuffer();
         const data = new Uint8Array(buffer);
@@ -125,34 +122,34 @@
             console.warn('[PDA drawing-button] list', sheetName, 'sa v exceli nenasiel');
             return;
         }
- 
+
         const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
         drawingIndex = buildDrawingIndex(rows);
         unsafeWindow.PDA_DRAWING_INDEX = drawingIndex;
         excelLoaded = true;
- 
+
         console.log('[PDA drawing-button] index vytvoreny, pocet zaznamov:', Object.keys(drawingIndex).length);
         updateLoadButtonState('loaded');
- 
+
         if (unsafeWindow.PDA_CURRENT_OPERATION) {
             applyDrawingForCurrentOperation(unsafeWindow.PDA_CURRENT_OPERATION);
         }
     }
- 
+
     async function loadExcelFromHandle(handle) {
         const file = await handle.getFile();
         await loadExcelFromFile(file);
     }
- 
+
     function findDrawingByOrderNo(orderNo) {
         return drawingIndex[orderNo] || null;
     }
     unsafeWindow.PDA_findDrawingByOrderNo = findDrawingByOrderNo;
- 
+
     // ---------- Vyber a znovupouzitie suboru cez File System Access API ----------
- 
+
     const supportsFsAccess = typeof unsafeWindow.showOpenFilePicker === 'function';
- 
+
     async function pickFileAndRemember() {
         try {
             const [handle] = await unsafeWindow.showOpenFilePicker({
@@ -169,30 +166,30 @@
             updateLoadButtonState('error');
         }
     }
- 
+
     async function tryAutoLoadFromStoredHandle() {
         console.log('[PDA drawing-button] tryAutoLoadFromStoredHandle: start, supportsFsAccess =', supportsFsAccess);
- 
+
         if (!supportsFsAccess) {
             updateLoadButtonState('unsupported');
             return;
         }
- 
+
         let handle;
         try {
             handle = await loadHandle();
         } catch (err) {
             console.warn('[PDA drawing-button] chyba pri citani ulozeneho handle-u z IndexedDB', err);
         }
- 
+
         if (!handle) {
             console.log('[PDA drawing-button] ziadny ulozeny handle sa nenasiel, treba vybrat subor manualne');
             updateLoadButtonState('nofile');
             return;
         }
- 
+
         console.log('[PDA drawing-button] najdeny ulozeny handle:', handle, 'nazov suboru:', handle.name);
- 
+
         let permission;
         try {
             permission = await handle.queryPermission({ mode: 'read' });
@@ -202,7 +199,7 @@
             updateLoadButtonState('needs-permission', handle);
             return;
         }
- 
+
         if (permission === 'granted') {
             updateLoadButtonState('loading');
             try {
@@ -213,11 +210,11 @@
             }
             return;
         }
- 
+
         // 'prompt' -> potrebny je jeden klik na potvrdenie (bez opatovneho prehliadania suborov)
         updateLoadButtonState('needs-permission', handle);
     }
- 
+
     async function confirmPermissionAndLoad(handle) {
         try {
             const permission = await handle.requestPermission({ mode: 'read' });
@@ -232,23 +229,23 @@
             updateLoadButtonState('error');
         }
     }
- 
+
     // ---------- XHR intercept: sledovanie aktualne otvorenej operacie ----------
     const TARGET_URL_SUBSTRING = '/client/1.0/executeBO';
- 
+
     unsafeWindow.PDA_CURRENT_OPERATION = unsafeWindow.PDA_CURRENT_OPERATION || null;
- 
+
     const originalOpen = unsafeWindow.XMLHttpRequest.prototype.open;
     const originalSend = unsafeWindow.XMLHttpRequest.prototype.send;
- 
+
     unsafeWindow.XMLHttpRequest.prototype.open = function (method, url, ...rest) {
         this._pdaDrawing_url = url;
         return originalOpen.call(this, method, url, ...rest);
     };
- 
+
     unsafeWindow.XMLHttpRequest.prototype.send = function (body) {
         const url = this._pdaDrawing_url || '';
- 
+
         if (url.includes(TARGET_URL_SUBSTRING)) {
             this.addEventListener('load', function () {
                 try {
@@ -261,10 +258,10 @@
                 }
             });
         }
- 
+
         return originalSend.apply(this, arguments);
     };
- 
+
     function handleCurrentOperationResponse(operation) {
         const current = {
             workcenter: operation.workcenterDescription,
@@ -275,48 +272,48 @@
             materialNo: operation.materialNo,
             material: operation.material,
         };
- 
+
         unsafeWindow.PDA_CURRENT_OPERATION = current;
         applyDrawingForCurrentOperation(current);
     }
- 
+
     function applyDrawingForCurrentOperation(current) {
         const orderNoForLookup = "'" + (current.productionOrderNo || '').slice(2);
         const drawing = findDrawingByOrderNo(orderNoForLookup);
- 
+
         updateDrawingButtonDisplay(drawing);
     }
- 
+
     function stripLeadingApostrophe(value) {
         if (!value) return value;
         return value.charAt(0) === "'" ? value.slice(1) : value;
     }
- 
+
     let currentDrawingInfo = null; // { drawingNo, version } zobrazene na tlacidle, ocistene od uvodneho apostrofu
- 
+
     function updateDrawingButtonDisplay(drawing) {
         const valueEl = document.getElementById('__pda_order_drawing_value__');
         const revisionEl = document.getElementById('__pda_order_drawing_revision__');
         if (!valueEl || !revisionEl) return;
- 
+
         if (drawing) {
             const cleanDrawingNo = stripLeadingApostrophe(drawing.drawingNo) || '—';
             const cleanVersion = stripLeadingApostrophe(drawing.version) || '';
- 
+
             currentDrawingInfo = { drawingNo: cleanDrawingNo, version: cleanVersion };
- 
+
             valueEl.textContent = cleanDrawingNo;
             revisionEl.textContent = cleanVersion ? 'rev. ' + cleanVersion : '';
         } else {
             currentDrawingInfo = null;
- 
+
             valueEl.textContent = '—';
             revisionEl.textContent = '';
         }
     }
- 
+
     // ---------- Sluzba "Mapa vykresov" (PDM) - hladanie a modalne okno so zoznamom ----------
- 
+
     function pdmHladaj(cislo) {
         return new Promise((resolve, reject) => {
             const params = new URLSearchParams({ q: cislo });
@@ -344,14 +341,14 @@
             });
         });
     }
- 
+
     function pdmOtvorOkno(cislo) {
         const overlay = document.createElement('div');
         overlay.id = '__pda_pdm_overlay__';
         overlay.style.cssText =
             'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99999;' +
             'display:flex;align-items:center;justify-content:center;font-family:inherit;';
- 
+
         overlay.innerHTML = `
             <div style="background:#ffffff;border-radius:10px;max-width:900px;width:92%;max-height:80vh;
                         display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.3)">
@@ -363,7 +360,7 @@
                 </div>
                 <div data-pda-telo style="padding:14px 16px;overflow:auto">Hľadám…</div>
             </div>`;
- 
+
         const zavri = () => {
             overlay.remove();
             document.removeEventListener('keydown', naEsc);
@@ -371,23 +368,23 @@
         const naEsc = (e) => {
             if (e.key === 'Escape') zavri();
         };
- 
+
         overlay.querySelector('[data-pda-zavrit]').addEventListener('click', zavri);
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay) zavri();
         });
         document.addEventListener('keydown', naEsc);
         document.body.appendChild(overlay);
- 
+
         const telo = overlay.querySelector('[data-pda-telo]');
- 
+
         pdmHladaj(cislo)
             .then((d) => {
                 if (!d.pocet) {
                     telo.innerHTML = `<p>Pre <b>${cislo}</b> sa nenašiel žiadny PDF ani TIFF výkres.</p>`;
                     return;
                 }
- 
+
                 telo.innerHTML = `
                     <table style="width:100%;border-collapse:collapse;font-size:14px">
                         <thead>
@@ -416,7 +413,7 @@
                         ${d.pocet} výkresov · ${d.zdroj === 'mapa' ? 'z dennej mapy' : 'naživo z PDM'}
                         ${d.mapa_z ? ' (' + d.mapa_z + ')' : ''} · kliknutím sa výkres otvorí
                     </p>`;
- 
+
                 telo.querySelectorAll('tr[data-id]').forEach((tr) => {
                     tr.addEventListener('click', () => {
                         unsafeWindow.open(`${PDM_BASE}/file/${tr.dataset.id}`, '_blank');
@@ -428,21 +425,21 @@
                 telo.innerHTML = `<p style="color:#b00000">Služba výkresov neodpovedala.<br>${err.message}</p>`;
             });
     }
- 
+
     // ---------- Vykreslenie tlacidla + tlacidlo na (opatovny) vyber/potvrdenie suboru ----------
     const CONTAINER_ID = 'WorkcenterDetail--Order_FlexBox';
     const WRAPPER_ID = '__pda_order_drawing_wrapper__';
     const BUTTON_ID = '__pda_order_drawing_button__';
     const LOAD_BUTTON_ID = '__pda_order_drawing_load_button__';
- 
+
     let pendingHandle = null;
     let currentLoadState = 'checking'; // zapamatany stav nezavisly od toho, ci tlacidlo uz existuje v DOM
- 
+
     function buildButton() {
         const button = document.createElement('button');
         button.id = BUTTON_ID;
         button.type = 'button';
- 
+
         button.style.display = 'flex';
         button.style.flexDirection = 'column';
         button.style.alignItems = 'flex-end';
@@ -455,30 +452,30 @@
         button.style.width = '150px';
         button.style.flexShrink = '0';
         button.style.marginRight = '8px';
- 
+
         const label = document.createElement('span');
         label.textContent = 'VÝKRES';
         label.style.fontSize = '0.65rem';
         label.style.color = '#888888';
         label.style.letterSpacing = '0.05em';
- 
+
         const value = document.createElement('span');
         value.id = '__pda_order_drawing_value__';
         value.textContent = '—';
         value.style.fontSize = '0.9rem';
         value.style.fontWeight = 'bold';
         value.style.color = '#000000';
- 
+
         const revision = document.createElement('span');
         revision.id = '__pda_order_drawing_revision__';
         revision.textContent = '';
         revision.style.fontSize = '0.75rem';
         revision.style.color = '#555555';
- 
+
         button.appendChild(label);
         button.appendChild(value);
         button.appendChild(revision);
- 
+
         button.addEventListener('click', () => {
             if (currentDrawingInfo && currentDrawingInfo.drawingNo) {
                 pdmOtvorOkno(currentDrawingInfo.drawingNo);
@@ -486,15 +483,15 @@
                 console.log('[PDA drawing-button] pre aktualnu zakazku nie je znamy ziadny vykres');
             }
         });
- 
+
         return button;
     }
- 
+
     function buildLoadButton() {
         const loadButton = document.createElement('button');
         loadButton.id = LOAD_BUTTON_ID;
         loadButton.type = 'button';
- 
+
         loadButton.style.padding = '6px 10px';
         loadButton.style.border = '1px solid #cccccc';
         loadButton.style.borderRadius = '6px';
@@ -503,7 +500,7 @@
         loadButton.style.fontSize = '0.75rem';
         loadButton.style.marginRight = '8px';
         loadButton.style.alignSelf = 'center';
- 
+
         loadButton.addEventListener('click', () => {
             if (pendingHandle) {
                 confirmPermissionAndLoad(pendingHandle);
@@ -511,23 +508,23 @@
                 pickFileAndRemember();
             }
         });
- 
+
         return loadButton;
     }
- 
+
     function updateLoadButtonState(state, handle) {
         currentLoadState = state;
         pendingHandle = state === 'needs-permission' ? handle : null;
- 
+
         const loadButton = document.getElementById(LOAD_BUTTON_ID);
         if (!loadButton) {
             console.log('[PDA drawing-button] updateLoadButtonState: tlacidlo este neexistuje v DOM, stav', state, 'si len zapamatavam');
             return;
         }
- 
+
         renderLoadButtonState(loadButton, state);
     }
- 
+
     function renderLoadButtonState(loadButton, state) {
         // po uspesnom nacitani sa tlacidlo uplne skryje - je to poistka, aby nikto omylom neklikal
         // na vyber/zmenu suboru; zmena suboru je zamerne mozna len manualne cez DevTools (vymazanie IndexedDB)
@@ -536,7 +533,7 @@
             return;
         }
         loadButton.style.display = '';
- 
+
         switch (state) {
             case 'loading':
                 loadButton.textContent = 'Načítavam…';
@@ -566,7 +563,7 @@
                 break;
         }
     }
- 
+
     function buildWrapper() {
         const wrapper = document.createElement('div');
         wrapper.id = WRAPPER_ID;
@@ -576,30 +573,30 @@
         wrapper.style.width = '100%';
         wrapper.style.boxSizing = 'border-box';
         wrapper.style.marginBottom = '8px';
- 
+
         wrapper.appendChild(buildLoadButton());
         wrapper.appendChild(buildButton());
         return wrapper;
     }
- 
+
     function ensureButton() {
         const container = document.getElementById(CONTAINER_ID);
         if (!container) return;
         if (document.getElementById(WRAPPER_ID)) return;
- 
+
         const wrapper = buildWrapper();
         container.insertBefore(wrapper, container.firstChild);
- 
+
         const loadButton = document.getElementById(LOAD_BUTTON_ID);
         if (loadButton) {
             renderLoadButtonState(loadButton, currentLoadState);
         }
- 
+
         if (unsafeWindow.PDA_CURRENT_OPERATION) {
             applyDrawingForCurrentOperation(unsafeWindow.PDA_CURRENT_OPERATION);
         }
     }
- 
+
     let debounceTimer = null;
     function scheduleEnsure() {
         if (debounceTimer) return;
@@ -608,12 +605,12 @@
             ensureButton();
         }, 300);
     }
- 
+
     scheduleEnsure();
     const observer = new MutationObserver(() => {
         if (!document.getElementById(WRAPPER_ID)) scheduleEnsure();
     });
     observer.observe(document.body, { childList: true, subtree: true });
- 
+
     tryAutoLoadFromStoredHandle();
 })();
