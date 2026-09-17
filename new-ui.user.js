@@ -4618,6 +4618,9 @@ body.${BODY_CLASS} { padding-bottom:34px !important; box-sizing:border-box; }
 #Main--MainPage-cont {
     top: 66px !important;
 }
+#Main--Hour_Date_Title {
+    margin-bottom: 0 !important;
+}
 #Main--Bar_Header-BarRight .sapMBtnInner {
     display: flex !important;
     align-items: center !important;
