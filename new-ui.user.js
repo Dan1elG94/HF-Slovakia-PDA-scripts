@@ -4630,6 +4630,14 @@ header.sapMPageHeader + section {
     margin: 12px !important;
     border-radius: 18px !important;
 }
+#__pda_custom_search_ui__ {
+    padding: 16px !important;
+    box-sizing: border-box !important;
+}
+#__pda_custom_search_ui__ > div:first-child {
+    padding: 0 !important;
+    margin-left: 20px !important;
+}
 [id$="Bar_Header-BarRight"] .sapMBtnInner {
     display: flex !important;
     align-items: center !important;
