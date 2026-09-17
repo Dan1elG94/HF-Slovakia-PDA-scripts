@@ -4614,9 +4614,9 @@ body.${BODY_CLASS} { padding-bottom:34px !important; box-sizing:border-box; }
     padding-right: 16px !important;
     box-sizing: border-box !important;
 }
-/* header narastol z povodnych 44px na 66px, + 16px medzera k obsahu pod nim */
+/* header narastol z povodnych 44px na 66px */
 #Main--MainPage-cont {
-    top: 82px !important;
+    top: 66px !important;
 }
 #Main--Bar_Header-BarRight .sapMBtnInner {
     display: flex !important;
