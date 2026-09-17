@@ -939,7 +939,7 @@
             header.className = 'sapMIBar sapMTB sapMTBNewFlex sapMTBInactive sapMTBStandard sapMTB-Transparent-CTX sapMListHdr sapMListHdrTBar sapMTBHeader-CTX';
             const headerTitle = document.createElement('div');
             headerTitle.className = 'sapMTitle sapMTitleStyleAuto sapMTitleNoWrap sapUiSelectable sapMTitleMaxWidth sapMTitleTB sapMBarChild sapMTBShrinkItem';
-            headerTitle.innerHTML = '<span dir="auto">Číslo zákazky</span>';
+            headerTitle.innerHTML = '<span dir="auto">Vyhľadať zákazku</span>';
             header.appendChild(headerTitle);
 
             const tbContainer = document.createElement('div');
@@ -4628,6 +4628,7 @@ header.sapMPageHeader + section {
 }
 #__pda_search_sidebar__ {
     margin: 12px !important;
+    border-radius: 18px !important;
 }
 [id$="Bar_Header-BarRight"] .sapMBtnInner {
     display: flex !important;
