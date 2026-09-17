@@ -4620,6 +4620,7 @@ body.${BODY_CLASS} { padding-bottom:34px !important; box-sizing:border-box; }
 }
 #Main--Hour_Date_Title {
     margin-bottom: 0 !important;
+    margin-top: 0 !important;
 }
 #Main--Bar_Header-BarRight .sapMBtnInner {
     display: flex !important;
