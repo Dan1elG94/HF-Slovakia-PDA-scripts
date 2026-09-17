@@ -4598,11 +4598,14 @@ body.${BODY_CLASS} { padding-bottom:34px !important; box-sizing:border-box; }
 .nd-topbar [id$="Button_Logout"] .sapMBtnInner { background:#e23b3b !important; border-color:#c72f2f !important; }
 .nd-topbar [id$="Button_Logout"] .sapMBtnContent, .nd-topbar [id$="Button_Logout"] bdi,
 .nd-topbar [id$="Button_Logout"] .sapUiIcon { color:#fff !important; }
-#Main--MainPage > header.sapMPageHeader {
+/* Selektory nizsie su zamerne bez view-prefixu (Main--, WorkcenterDetail--, ...),
+   aby platili na vsetkych podstrankach - SAPUI5 ma v kazdom view rovnaky
+   nazov controlu, len s inym prefixom pred "--". */
+header.sapMPageHeader {
     min-height: 62px !important;
     position: relative !important;
 }
-#Main--Bar_Header {
+[id$="Bar_Header"] {
     background-color: #ffffff !important;
     padding-top: 8px !important;
     padding-bottom: 8px !important;
@@ -4610,27 +4613,28 @@ body.${BODY_CLASS} { padding-bottom:34px !important; box-sizing:border-box; }
     min-height: 62px !important;
     position: relative !important;
 }
-#Main--Bar_Header-BarRight {
+[id$="Bar_Header-BarRight"] {
     padding-right: 16px !important;
     box-sizing: border-box !important;
 }
-/* header narastol z povodnych 44px na 62px (54px + 8px padding-bottom) */
-#Main--MainPage-cont {
+/* header narastol z povodnych 44px na 62px (54px + 8px padding-bottom);
+   sekcia s obsahom je vzdy priamy "section" susediaci za header.sapMPageHeader */
+header.sapMPageHeader + section {
     top: 62px !important;
 }
-#Main--Hour_Date_Title {
+[id$="Hour_Date_Title"] {
     margin-bottom: 0 !important;
     margin-top: 0 !important;
 }
-#Main--Bar_Header-BarRight .sapMBtnInner {
+[id$="Bar_Header-BarRight"] .sapMBtnInner {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     border-radius: 8px !important;
 }
-#Main--Bar_Header-BarRight .sapMBtnInner img,
-#Main--Bar_Header-BarRight .sapMBtnInner .sapMBtnContent,
-#Main--Bar_Header-BarRight .sapMBtnInner .sapMBtnContent bdi {
+[id$="Bar_Header-BarRight"] .sapMBtnInner img,
+[id$="Bar_Header-BarRight"] .sapMBtnInner .sapMBtnContent,
+[id$="Bar_Header-BarRight"] .sapMBtnInner .sapMBtnContent bdi {
     vertical-align: middle !important;
 }
 
