@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         PDA - New UI
 // @namespace    http://tampermonkey.net/
-// @version      2.0.0
-// @description  Centralna vizualna stylizacia celej PDA stranky (farby, karty, zaoblenia, preusporiadanie do 4 riadkov) podla navrhu. Jedine miesto, kde sa mení CSS existujucich elementov.
+// @version      2.1.0
+// @description  Centralna vizualna stylizacia celej PDA stranky (farby, karty, zaoblenia, preusporiadanie do 4 riadkov, nadpis "Stav operácie", jednotny radius tlacidiel) podla navrhu. Jedine miesto, kde sa mení CSS existujucich elementov.
 // @author       Gabris
 // @match        https://hf.simplifier.cloud/appDirect/PDA/
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=simplifier.cloud
@@ -80,11 +80,11 @@
             font-size: 0.85rem !important;
         }
         #Main--Bar_Header-BarRight button.sapMBtnBase {
-            border-radius: 999px !important;
+            border-radius: var(--pda-radius-sm) !important;
             transition: background-color .12s ease;
         }
         #Main--Bar_Header-BarRight .sapMBtnInner {
-            border-radius: 999px !important;
+            border-radius: var(--pda-radius-sm) !important;
             padding: 0 0.9rem !important;
         }
         #Main--Bar_Header-BarRight button.sapMBtnBase:hover .sapMBtnInner {
@@ -95,6 +95,13 @@
             color: #c0392b !important;
         }
         #Main--Button_Logout-inner .sapMBtnContent bdi { color: #c0392b !important; }
+
+        /* ---------- Jednotny radius vsetkych tlacidiel v aplikacii (8px) ---------- */
+        .sapMBtnBase,
+        .sapMBtnBase .sapMBtnInner,
+        .sapMBtnInner {
+            border-radius: var(--pda-radius-sm) !important;
+        }
 
         /* ---------- Lavy panel: Pracovny zoznam ---------- */
         #Main--Workcenter_Panel,
@@ -160,10 +167,18 @@
             align-items: start !important;
             width: 100% !important;
         }
-        #WorkcenterDetail--Order_Status_Flexbox {
+        #__pda_order_status_wrapper__ {
             grid-row: 1 !important;
             grid-column: 1 !important;
+            background-color: var(--pda-card-bg) !important;
+            border: 1px solid var(--pda-border) !important;
+            border-radius: var(--pda-radius-lg) !important;
+            box-shadow: var(--pda-shadow) !important;
+            padding: 14px 16px !important;
+            box-sizing: border-box !important;
+            width: 100% !important;
         }
+        #__pda_order_status_wrapper__ > .pda-section-heading { margin: 0 0 10px 0; }
         #__pda_order_row2__ {
             grid-row: 2 !important;
             grid-column: 1 !important;
@@ -226,7 +241,7 @@
         #WorkcenterDetail--Order_Status_Flexbox { gap: 8px; }
         #WorkcenterDetail--Order_Status_Flexbox .statusBtn,
         #WorkcenterDetail--Order_Status_Flexbox .statusBtn .sapMBtnInner {
-            border-radius: 999px !important;
+            border-radius: var(--pda-radius-sm) !important;
         }
         #WorkcenterDetail--Order_Status_Flexbox .statusBtn .sapMBtnInner {
             font-weight: 600 !important;
@@ -366,6 +381,7 @@
     // ---------- Preusporiadanie WorkcenterDetail--Order_FlexBox do 4 riadkov ----------
     const ORDER_FLEXBOX_ID = 'WorkcenterDetail--Order_FlexBox';
     const ROW1_ID = 'WorkcenterDetail--Order_Status_Flexbox';
+    const STATUS_WRAPPER_ID = '__pda_order_status_wrapper__';
     const ROW2_WRAPPER_ID = '__pda_order_row2__';
     const ROW3_WRAPPER_ID = '__pda_order_row3__';
     const ROW4_WRAPPER_ID = '__pda_order_row4__';
@@ -388,10 +404,23 @@
         const orderFlexBox = document.getElementById(ORDER_FLEXBOX_ID);
         if (!orderFlexBox) return;
 
-        const row1 = document.getElementById(ROW1_ID);
+        const statusWrapper = ensureRowWrapper(STATUS_WRAPPER_ID);
         const row2 = ensureRowWrapper(ROW2_WRAPPER_ID);
         const row3 = ensureRowWrapper(ROW3_WRAPPER_ID);
         const row4 = ensureRowWrapper(ROW4_WRAPPER_ID);
+
+        // Wrappery pripojime do gridu hned, aby ich nasledne vedeli najst
+        // pomocnici pracujuci cez document.getElementById (napr. ensureHeadingInside).
+        [statusWrapper, row2, row3, row4].forEach((el) => {
+            if (el && el.parentElement !== orderFlexBox) orderFlexBox.appendChild(el);
+        });
+
+        // Riadok 1: nadpis "STAV OPERÁCIE" a pod nim stavove tlacidla
+        const statusFlexbox = document.getElementById(ROW1_ID);
+        if (statusFlexbox && statusFlexbox.parentElement !== statusWrapper) {
+            statusWrapper.appendChild(statusFlexbox);
+        }
+        ensureHeadingInside(STATUS_WRAPPER_ID, '__pda_heading_status__', 'STAV OPERÁCIE');
 
         // Riadok 2: presunut tlacidla do wrappera (v poradi Vykres, BOM, Operation Complete)
         ROW2_ITEM_IDS.forEach((id) => {
@@ -415,14 +444,9 @@
             if (el && el.parentElement !== row4) row4.appendChild(el);
         });
 
-        // Zaistit, ze vsetkych 5 hlavnych prvkov (riadok1 + 3 wrappery) su priame deti Order_FlexBox
-        [row1, row2, row3, row4].forEach((el) => {
-            if (el && el.parentElement !== orderFlexBox) orderFlexBox.appendChild(el);
-        });
-
         // Vsetko ostatne, co ostalo priamym dietatom Order_FlexBox (povodne wrappery,
         // z ktorych sme prvky vytiahli), skryjeme, aby nerozbijalo 4-riadkovy grid.
-        const allowed = new Set([row1, row2, row3, row4].filter(Boolean));
+        const allowed = new Set([statusWrapper, row2, row3, row4].filter(Boolean));
         Array.from(orderFlexBox.children).forEach((child) => {
             if (!allowed.has(child)) {
                 if (child.style.display !== 'none') child.style.setProperty('display', 'none', 'important');
