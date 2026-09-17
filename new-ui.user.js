@@ -4610,6 +4610,14 @@ body.${BODY_CLASS} { padding-bottom:34px !important; box-sizing:border-box; }
     min-height: 66px !important;
     position: relative !important;
 }
+#Main--Bar_Header-BarRight {
+    padding-right: 16px !important;
+    box-sizing: border-box !important;
+}
+/* header narastol z povodnych 44px na 66px, + 16px medzera k obsahu pod nim */
+#Main--MainPage-cont {
+    top: 82px !important;
+}
 #Main--Bar_Header-BarRight .sapMBtnInner {
     display: flex !important;
     align-items: center !important;
