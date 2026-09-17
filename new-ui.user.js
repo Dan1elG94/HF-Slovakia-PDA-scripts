@@ -4628,6 +4628,7 @@ header.sapMPageHeader + section {
 }
 #__pda_custom_search_ui__ {
     margin: 12px !important;
+    width: calc(100% - 24px) !important;
 }
 [id$="Bar_Header-BarRight"] .sapMBtnInner {
     display: flex !important;
