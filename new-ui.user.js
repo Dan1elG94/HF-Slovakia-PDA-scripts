@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         PDA - New UI
 // @namespace    http://tampermonkey.net/
-// @version      1.0.0
-// @description  Centralna vizualna stylizacia celej PDA stranky (farby, karty, zaoblenia) podla navrhu. Jedine miesto, kde sa mení CSS existujucich elementov.
+// @version      2.0.0
+// @description  Centralna vizualna stylizacia celej PDA stranky (farby, karty, zaoblenia, preusporiadanie do 4 riadkov) podla navrhu. Jedine miesto, kde sa mení CSS existujucich elementov.
 // @author       Gabris
 // @match        https://hf.simplifier.cloud/appDirect/PDA/
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=simplifier.cloud
@@ -146,9 +146,55 @@
             box-shadow: var(--pda-shadow) !important;
             padding: 14px 16px !important;
             box-sizing: border-box !important;
-            margin-bottom: 10px !important;
+            margin-bottom: 0 !important;
+            width: 100% !important;
         }
         #WorkcenterDetail--TimerCharts_FlexBox { padding-top: 30px !important; position: relative; }
+
+        /* ---------- Preusporiadanie WorkcenterDetail--Order_FlexBox do 4 riadkov ---------- */
+        #WorkcenterDetail--Order_FlexBox {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            grid-template-rows: repeat(4, auto) !important;
+            gap: 12px !important;
+            align-items: start !important;
+            width: 100% !important;
+        }
+        #WorkcenterDetail--Order_Status_Flexbox {
+            grid-row: 1 !important;
+            grid-column: 1 !important;
+        }
+        #__pda_order_row2__ {
+            grid-row: 2 !important;
+            grid-column: 1 !important;
+            display: flex !important;
+            gap: 8px !important;
+            align-items: stretch !important;
+            width: 100% !important;
+        }
+        #__pda_order_row2__ > .sapMFlexItem,
+        #__pda_order_row2__ > button {
+            flex: 1 1 0 !important;
+            width: auto !important;
+        }
+        #__pda_order_row2__ > #__pda_order_drawing_wrapper__ {
+            flex: 0 0 auto !important;
+        }
+        #__pda_order_row3__,
+        #__pda_order_row4__ {
+            grid-column: 1 !important;
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 12px !important;
+            align-items: start !important;
+            width: 100% !important;
+        }
+        #__pda_order_row3__ { grid-row: 3 !important; }
+        #__pda_order_row4__ { grid-row: 4 !important; }
+        #__pda_order_row3__ > *,
+        #__pda_order_row4__ > * {
+            min-width: 0 !important;
+        }
 
         .pda-section-heading {
             font-size: 0.72rem;
@@ -317,6 +363,73 @@
         }
     }
 
+    // ---------- Preusporiadanie WorkcenterDetail--Order_FlexBox do 4 riadkov ----------
+    const ORDER_FLEXBOX_ID = 'WorkcenterDetail--Order_FlexBox';
+    const ROW1_ID = 'WorkcenterDetail--Order_Status_Flexbox';
+    const ROW2_WRAPPER_ID = '__pda_order_row2__';
+    const ROW3_WRAPPER_ID = '__pda_order_row3__';
+    const ROW4_WRAPPER_ID = '__pda_order_row4__';
+    const DRAWING_WRAPPER_ID = '__pda_order_drawing_wrapper__';
+
+    const ROW2_ITEM_IDS = ['__pda_order_drawing_button__', 'WorkcenterDetail--BoM_Button', 'WorkcenterDetail--Confirm_Button'];
+    const ROW3_ITEM_IDS = ['WorkcenterDetail--Main_SimpleForm', 'WorkcenterDetail--TimerCharts_FlexBox'];
+    const ROW4_ITEM_IDS = ['WorkcenterDetail--Description_SimpleForm', 'WorkcenterDetail--OrderStatus_List'];
+
+    function ensureRowWrapper(id) {
+        let wrapper = document.getElementById(id);
+        if (!wrapper) {
+            wrapper = document.createElement('div');
+            wrapper.id = id;
+        }
+        return wrapper;
+    }
+
+    function reorganizeOrderLayout() {
+        const orderFlexBox = document.getElementById(ORDER_FLEXBOX_ID);
+        if (!orderFlexBox) return;
+
+        const row1 = document.getElementById(ROW1_ID);
+        const row2 = ensureRowWrapper(ROW2_WRAPPER_ID);
+        const row3 = ensureRowWrapper(ROW3_WRAPPER_ID);
+        const row4 = ensureRowWrapper(ROW4_WRAPPER_ID);
+
+        // Riadok 2: presunut tlacidla do wrappera (v poradi Vykres, BOM, Operation Complete)
+        ROW2_ITEM_IDS.forEach((id) => {
+            const el = document.getElementById(id);
+            if (el && el.parentElement !== row2) row2.appendChild(el);
+        });
+        // vlastny wrapper tlacidla na vykres (moze obsahovat aj tlacidlo "Nacitat Excel")
+        // presunieme tiez do riadku 2, aby neostal ako osamoteny prvok inde na stranke
+        const drawingWrapper = document.getElementById(DRAWING_WRAPPER_ID);
+        if (drawingWrapper && drawingWrapper.parentElement !== row2) row2.appendChild(drawingWrapper);
+
+        // Riadok 3: Zakazka a material (lavo) + SAP casy (pravo)
+        ROW3_ITEM_IDS.forEach((id) => {
+            const el = document.getElementById(id);
+            if (el && el.parentElement !== row3) row3.appendChild(el);
+        });
+
+        // Riadok 4: Popis operacie (lavo) + Paralelne procesy (pravo)
+        ROW4_ITEM_IDS.forEach((id) => {
+            const el = document.getElementById(id);
+            if (el && el.parentElement !== row4) row4.appendChild(el);
+        });
+
+        // Zaistit, ze vsetkych 5 hlavnych prvkov (riadok1 + 3 wrappery) su priame deti Order_FlexBox
+        [row1, row2, row3, row4].forEach((el) => {
+            if (el && el.parentElement !== orderFlexBox) orderFlexBox.appendChild(el);
+        });
+
+        // Vsetko ostatne, co ostalo priamym dietatom Order_FlexBox (povodne wrappery,
+        // z ktorych sme prvky vytiahli), skryjeme, aby nerozbijalo 4-riadkovy grid.
+        const allowed = new Set([row1, row2, row3, row4].filter(Boolean));
+        Array.from(orderFlexBox.children).forEach((child) => {
+            if (!allowed.has(child)) {
+                if (child.style.display !== 'none') child.style.setProperty('display', 'none', 'important');
+            }
+        });
+    }
+
     // ---------- Pravy PDA panel - placeholder ----------
     const RIGHT_SIDEBAR_ID = '__pda_right_sidebar_placeholder__';
 
@@ -336,6 +449,7 @@
     // ---------- Aplikovanie vsetkeho, opakovane pri zmenach DOM ----------
     function applyAll() {
         injectStyles();
+        reorganizeOrderLayout();
         applyStatusButtonColors();
         ensureHeadingInside('WorkcenterDetail--Main_SimpleForm', '__pda_heading_order__', 'Zákazka a materiál');
         ensureHeadingInside('WorkcenterDetail--Description_SimpleForm', '__pda_heading_description__', 'Popis operácie');
