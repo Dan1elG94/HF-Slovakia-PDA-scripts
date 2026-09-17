@@ -4626,6 +4626,9 @@ header.sapMPageHeader + section {
     margin-bottom: 0 !important;
     margin-top: 0 !important;
 }
+#__pda_custom_search_ui__ {
+    margin: 12px !important;
+}
 [id$="Bar_Header-BarRight"] .sapMBtnInner {
     display: flex !important;
     align-items: center !important;
