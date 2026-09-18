@@ -4529,16 +4529,16 @@ body.${BODY_CLASS} .sapMPanelHdr .sapMTitle, body.${BODY_CLASS} .sapMPanelHdr .s
    beru z data-* atributov, ktore na obal doplna JS. Skutocny text tlacidla
    zostava netknuty v .sapMBtnContent. */
 body.${BODY_CLASS} .statusBtn { border-radius:16px !important; border:1px solid #b9cdee !important;
-  background-color:#dfeafc !important; box-shadow:0 6px 16px rgba(16,36,63,.18) !important;
+  background-color:#0d4a8f !important; box-shadow:0 6px 16px rgba(16,36,63,.18) !important;
   min-width:190px !important; height:96px !important; box-sizing:border-box !important; }
-body.${BODY_CLASS} .statusBtn .sapMBtnInner { padding:12px 18px 12px 14px !important; border-radius:16px !important;
-  display:grid !important; grid-template-columns:minmax(0,1fr) !important;
-  grid-template-rows:auto !important; column-gap:12px !important; align-items:center !important;
-  height:100% !important; box-sizing:border-box !important;
-  background-image:none !important; background-color:#dfeafc !important; }
-body.${BODY_CLASS} .statusBtn .sapMBtnContent { grid-column:1 !important; grid-row:1 !important;
-  justify-content:flex-start !important; text-align:left !important; font-size:15px !important;
-  font-weight:800 !important; line-height:1.2 !important; white-space:nowrap !important; }
+body.${BODY_CLASS} .statusBtn .sapMBtnInner { padding:12px 18px !important; border-radius:16px !important;
+  display:flex !important; align-items:center !important; justify-content:center !important;
+  height:100% !important; width:100% !important; box-sizing:border-box !important;
+  background-image:none !important; background-color:#0d4a8f !important; }
+body.${BODY_CLASS} .statusBtn .sapMBtnContent { justify-content:center !important; text-align:center !important;
+  font-size:15px !important; font-weight:800 !important; line-height:1.2 !important;
+  white-space:nowrap !important; color:#fff !important; }
+body.${BODY_CLASS} .statusBtn .sapMBtnContent, body.${BODY_CLASS} .statusBtn bdi { color:#fff !important; }
 
 /* ---------- nadpisy sekcii ---------- */
 .nd-nadpis { font:800 12px/1.3 -apple-system,"Segoe UI",Roboto,sans-serif; letter-spacing:.14em;
