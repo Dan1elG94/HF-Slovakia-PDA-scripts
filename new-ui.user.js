@@ -4627,12 +4627,17 @@ header.sapMPageHeader + section {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    border-radius: 8px !important;
+    border-radius: 10px !important;
 }
 [id$="Bar_Header-BarRight"] .sapMBtnInner img,
 [id$="Bar_Header-BarRight"] .sapMBtnInner .sapMBtnContent,
 [id$="Bar_Header-BarRight"] .sapMBtnInner .sapMBtnContent bdi {
     vertical-align: middle !important;
+}
+/* rovnaky hover ako pri riadkoch zakaziek (#WorkcenterDetail--Work_List .pda-pill-on:hover) */
+[id$="Bar_Header-BarRight"] .sapMBtn:hover .sapMBtnInner {
+    border-color: #7ba4ee !important;
+    box-shadow: 0 3px 10px rgba(16,36,63,.12) !important;
 }
 
 /* ---------- riadok akcii pod stavmi: Vykres | Components/BOM | Stroj ON/OFF | Operation Complete ---------- */
