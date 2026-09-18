@@ -4593,22 +4593,23 @@ body.${BODY_CLASS} { padding-bottom:34px !important; box-sizing:border-box; }
 
 /* ---------- horny pruh: navigacia ako biele pilulky, odhlasenie cervene ---------- */
 .nd-topbar { background:rgba(255,255,255,.88) !important; border-bottom:1px solid #e3ebf5 !important; }
-/* :not([id*="expandButton"]) - inak toto pravidlo omylom zasiahne aj expand/collapse
-   sipku panela Workcenter_Panel, ktora sa (podla hornyPruh() vyssie) niekedy
-   ocitne pod tou istou "nd-topbar" znackou */
-.nd-topbar .sapMBtn:not([id*="expandButton"]) .sapMBtnInner { background:#fff !important; border:1px solid #dfe7f2 !important;
+.nd-topbar .sapMBtn .sapMBtnInner { background:#fff !important; border:1px solid #dfe7f2 !important;
   border-radius:12px !important; box-shadow:0 2px 8px rgba(16,36,63,.10) !important; color:#13315c !important;
   font-weight:700 !important; padding:6px 14px !important; }
-[id*="expandButton"] .sapMBtnInner, [id*="expandButton"].sapMBtnInner {
+.nd-topbar .sapMBtn .sapMBtnContent, .nd-topbar .sapMBtn bdi, .nd-topbar .sapMBtn .sapUiIcon { color:#13315c !important; }
+.nd-topbar [id$="Button_Logout"] .sapMBtnInner { background:#e23b3b !important; border-color:#c72f2f !important; }
+.nd-topbar [id$="Button_Logout"] .sapMBtnContent, .nd-topbar [id$="Button_Logout"] bdi,
+.nd-topbar [id$="Button_Logout"] .sapUiIcon { color:#fff !important; }
+/* expand/collapse sipka panela Workcenter_Panel sa niekedy ocitne pod tou istou
+   "nd-topbar" znackou (hornyPruh() vyssie) - vynimka nesmie menit specificitu
+   pravidiel vyssie (tym sa raz uz omylom rozbila farba tlacidla Odhlasenie),
+   preto samostatne pravidlo s umelo zvysenou specificitou (opakovany atribut) */
+[id*="expandButton"][id*="expandButton"][id*="expandButton"] .sapMBtnInner {
   border: none !important;
   box-shadow: none !important;
   border-radius: 0 !important;
   padding: 0 !important;
 }
-.nd-topbar .sapMBtn .sapMBtnContent, .nd-topbar .sapMBtn bdi, .nd-topbar .sapMBtn .sapUiIcon { color:#13315c !important; }
-.nd-topbar [id$="Button_Logout"] .sapMBtnInner { background:#e23b3b !important; border-color:#c72f2f !important; }
-.nd-topbar [id$="Button_Logout"] .sapMBtnContent, .nd-topbar [id$="Button_Logout"] bdi,
-.nd-topbar [id$="Button_Logout"] .sapUiIcon { color:#fff !important; }
 /* Selektory nizsie su zamerne bez view-prefixu (Main--, WorkcenterDetail--, ...),
    aby platili na vsetkych podstrankach - SAPUI5 ma v kazdom view rovnaky
    nazov controlu, len s inym prefixom pred "--". */
