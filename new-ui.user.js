@@ -432,7 +432,9 @@
     /* ---------------------- 3.1 Vylepsena hlavicka ---------------------- */
 
     function modEnhancedHeader() {
-        const USERNAME_SUFFIX = 'Label_Username-bdi';
+        // pozor: na roznych strankach ma element ine ID (napr. Main--Label_Username-bdi
+        // vs. WorkcenterDetail--Label_Username2-bdi), preto "obsahuje" + "konci na", nie presny suffix
+        const USERNAME_SELECTOR = '[id*="Label_Username"][id$="-bdi"]';
         const BUTTONS = [
             { suffix: 'Button_HomeScreen-img', label: 'Pracoviská' },
             { suffix: 'Button_Reporting-img', label: 'Reporty' },
@@ -445,7 +447,7 @@
         const LOGOUT_BUTTON_SUFFIX = 'Button_Logout-inner';
 
         function apply() {
-            document.querySelectorAll('[id$="' + USERNAME_SUFFIX + '"]').forEach((el) => {
+            document.querySelectorAll(USERNAME_SELECTOR).forEach((el) => {
                 if (el.dataset.pdaUsernameStyled) return;
                 el.style.fontSize = '1.8rem';
                 el.style.fontWeight = 'bold';
@@ -2142,7 +2144,7 @@
                 const n = g && g.getVar('oUser', 'username');
                 if (n) return String(n);
             } catch (e) { /* ignore */ }
-            const el = document.querySelector('[id$="Label_Username-bdi"]');
+            const el = document.querySelector('[id*="Label_Username"][id$="-bdi"]');
             return el ? el.textContent.trim() : '';
         }
 
