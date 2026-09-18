@@ -4612,6 +4612,7 @@ header.sapMPageHeader {
     box-sizing: border-box !important;
     min-height: 62px !important;
     position: relative !important;
+    border-bottom: none !important;
 }
 [id$="Bar_Header-BarRight"] {
     padding-right: 16px !important;
