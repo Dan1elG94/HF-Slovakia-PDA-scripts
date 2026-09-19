@@ -4545,7 +4545,8 @@ body.${BODY_CLASS} .statusBtn .sapMBtnContent, body.${BODY_CLASS} .statusBtn bdi
   text-transform:uppercase; color:#4a6285; margin:6px 0 8px 2px; }
 .nd-v-riadku { flex:0 0 100% !important; width:100% !important; box-sizing:border-box; margin:2px 0 6px 6px !important; }
 body.${BODY_CLASS} #WorkcenterDetail--Order_Status_Flexbox,
-body.${BODY_CLASS} #WorkcenterDetail--OrderHeader_FlexBox { flex-wrap:wrap !important; }
+body.${BODY_CLASS} #WorkcenterDetail--OrderHeader_FlexBox,
+body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox { flex-wrap:wrap !important; }
 
 /* ---------- pravy stlpec appky ---------- */
 body.${BODY_CLASS} #WorkcenterDetail--Order_Status_Flexbox {
@@ -4662,12 +4663,41 @@ body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button bdi { color:#fff !important
 body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button .sapMBtnInner::before { content:'✓'; color:#fff; font-weight:900; margin-right:8px; }
 
 /* ---------- karta ZAKAZKA A MATERIAL: velky nazov materialu + riadky ---------- */
-body.${BODY_CLASS} #WorkcenterDetail--OrderHeader_FlexBox .sapUiForm { background:#fff !important; border:1px solid #e3ebf5 !important;
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm { background:#fff !important; border:1px solid #e3ebf5 !important;
   border-radius:16px !important; padding:14px 18px !important; box-shadow:0 4px 14px rgba(16,36,63,.06) !important; }
 .nd-mat-title { font:800 20px/1.25 -apple-system,"Segoe UI",Roboto,sans-serif; color:#13315c; margin:0 0 10px; }
 .nd-extra .nd-riadok { display:flex; gap:16px; font:14px/1.7 -apple-system,"Segoe UI",Roboto,sans-serif; }
 .nd-extra .k { flex:0 0 190px; color:#4a6285; }
 .nd-extra .v { color:#13315c; font-weight:600; }
+
+/* ---------- mriezka pod riadkom akcii: zakazka+material | SAP casy (hore),
+   popis operacie | paralelne procesy (dole) - namiesto povodneho radenia
+   pod sebou. Prvky sa presuvaju funkciou usporiadajDetailMriezku(), tu sa
+   len rozmiestnuju cez grid-area podla ID (poradie v DOM je jedno). ---------- */
+body.${BODY_CLASS} #WorkcenterDetail--OrderDetails_FlexBox.nd-detail-grid {
+  display:grid !important; grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+  grid-template-areas:"zakazka casy" "popis paralelne" !important;
+  align-items:stretch !important; gap:12px !important;
+  height:auto !important; width:100% !important; margin:0 0 10px !important; }
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm { grid-area:zakazka !important;
+  width:100% !important; max-width:none !important; height:auto !important; margin:0 !important; min-width:0 !important; }
+body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox { grid-area:casy !important;
+  width:100% !important; height:auto !important; margin:0 !important; min-width:0 !important;
+  background:#fff !important; border:1px solid #e3ebf5 !important; border-radius:16px !important;
+  padding:10px 14px !important; box-shadow:0 4px 14px rgba(16,36,63,.06) !important; box-sizing:border-box !important;
+  align-items:center !important; }
+body.${BODY_CLASS} #WorkcenterDetail--SimpleForm_FlexBox { grid-area:popis !important;
+  width:100% !important; max-width:none !important; height:100% !important; margin:0 !important; min-width:0 !important; }
+body.${BODY_CLASS} #WorkcenterDetail--SimpleForm_FlexBox #__pda_opis_button__ { height:100% !important;
+  margin:0 !important; max-width:none !important; box-sizing:border-box !important; align-content:start !important; }
+body.${BODY_CLASS} #WorkcenterDetail--Order_Info_Buttons_FlexBox { grid-area:paralelne !important;
+  width:100% !important; height:100% !important; margin:0 !important; min-width:0 !important; }
+body.${BODY_CLASS} #WorkcenterDetail--Order_Info_Buttons_FlexBox .sapMList { background:#fff !important;
+  border:1px solid #e3ebf5 !important; border-radius:16px !important; box-shadow:0 4px 14px rgba(16,36,63,.06) !important;
+  height:100% !important; box-sizing:border-box !important; overflow:hidden !important; }
+body.${BODY_CLASS} #WorkcenterDetail--Order_Info_Buttons_FlexBox .sapMListHdrText { background:transparent !important;
+  border:0 !important; font-size:12px !important; font-weight:800 !important; letter-spacing:.14em !important;
+  text-transform:uppercase !important; color:#4a6285 !important; padding:12px 14px 6px !important; height:auto !important; }
 
 /* ---------- SAP casy: ploche kolace s percentom v strede a legendou ---------- */
 body.${BODY_CLASS} .pda-3d { transform:none !important; margin-top:6px !important;
@@ -4682,6 +4712,21 @@ body.${BODY_CLASS} .pda-3d:hover { transform:none !important; }
 .nd-legenda i { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:5px; vertical-align:middle; }
 .nd-legenda .a i { background:#2b7fe0; }
 .nd-legenda .b i { background:#c9d4e2; }
+
+/* ---------- SAP casy v karte: kompaktne kolace vedla seba (nadpis, potom
+   maly kolac s percentom, cas pod nim), bez legendy - setri miesto v mriezke ---------- */
+body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox .sapMVBox { flex:1 1 0 !important; min-width:0 !important;
+  align-items:center !important; }
+body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox .sapMLabel { order:1 !important; font-size:10.5px !important;
+  letter-spacing:.08em !important; text-transform:uppercase !important; color:#4a6285 !important; font-weight:800 !important;
+  margin:0 0 2px !important; }
+body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox canvas.pda-3d { order:2 !important;
+  width:84px !important; height:84px !important; margin:2px auto !important; }
+body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox .sapMText { order:3 !important;
+  font-size:11px !important; color:#6b7c95 !important; margin:2px 0 0 !important; }
+body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox .nd-legenda { display:none !important; }
+body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox .nd-pct .c { font-size:16px !important; }
+body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox .nd-pct .h { display:none !important; }
 
 /* ---------- POPIS OPERACIE ako karta s "Cely text" ---------- */
 body.${BODY_CLASS} #__pda_opis_button__ { display:grid !important; grid-template-columns:1fr auto !important;
@@ -4826,7 +4871,7 @@ body.${BODY_CLASS} #__pda_hf_menu__ .hf-btn .n { font-size:14px !important; }
          * pracovisko. Hodnoty appky sa nemenia, len sa dopisu nase prvky.
          */
         function kartaZakazky() {
-            const form = document.querySelector('#WorkcenterDetail--OrderHeader_FlexBox .sapUiForm');
+            const form = document.querySelector('#WorkcenterDetail--Main_SimpleForm .sapUiForm');
             if (!form) return;
 
             let nazov = '';
@@ -4954,6 +4999,34 @@ body.${BODY_CLASS} #__pda_hf_menu__ .hf-btn .n { font-size:14px !important; }
             if (sipka && sipka.textContent !== 'Celý text ›') sipka.textContent = 'Celý text ›';
         }
 
+        /*
+         * Karty pod riadkom akcii usporiadane do mriezky 2x2 namiesto pod
+         * sebou: zakazka a material | SAP casy (hore), popis operacie |
+         * paralelne procesy (dole). #WorkcenterDetail--OrderDetails_FlexBox
+         * uz obsahuje SimpleForm_FlexBox (popis) a TimerCharts_FlexBox
+         * (kolace) - don sa este presunie Main_SimpleForm (bol vnutri
+         * OrderHeader_FlexBox, za riadkom akcii, ktory sa nedotyka) a
+         * Order_Info_Buttons_FlexBox (bol az za OrderDetails_FlexBox).
+         * Prvky sa len presuvaju (su zive, appka ich stale ovlada), su to
+         * ine ID, viditelne miesto v mriezke urcuje CSS cez grid-area,
+         * takze na poradi v DOM nezalezi.
+         */
+        function usporiadajDetailMriezku() {
+            const grid = document.getElementById('WorkcenterDetail--OrderDetails_FlexBox');
+            const zakazka = document.getElementById('WorkcenterDetail--Main_SimpleForm');
+            const paralelne = document.getElementById('WorkcenterDetail--Order_Info_Buttons_FlexBox');
+            if (!grid || !zakazka || !paralelne) return;
+            if (!grid.classList.contains('nd-detail-grid')) grid.classList.add('nd-detail-grid');
+            if (zakazka.parentElement !== grid) grid.appendChild(zakazka);
+            if (paralelne.parentElement !== grid) grid.appendChild(paralelne);
+        }
+
+        /* --- hlavicka zoznamu "Parallel Process Handling" -> "Paralelne procesy" --- */
+        function prekladHlavicky() {
+            const h = document.getElementById('WorkcenterDetail--OrderStatus_List-header');
+            if (h && /parallel process/i.test(h.textContent || '')) h.textContent = 'Paralelné procesy';
+        }
+
         /* --- lavy zoznam: pocet operacii vedla nadpisu "Pracovny zoznam" --- */
         function pocetZoznamu() {
             const box = document.getElementById('__pda_left_box_zoznam__') ||
@@ -5003,9 +5076,11 @@ body.${BODY_CLASS} #__pda_hf_menu__ .hf-btn .n { font-size:14px !important; }
 
             nadpisDo(document.getElementById('WorkcenterDetail--Order_Status_Flexbox'), 'Stav operácie', 'stav');
             nadpisDo(document.getElementById('WorkcenterDetail--OrderHeader_FlexBox'), 'Zákazka a materiál', 'zakazka');
+            nadpisDo(document.getElementById('WorkcenterDetail--TimerCharts_FlexBox'), 'SAP časy', 'casy');
 
             // kazda cast zvlast v try/catch - chyba v jednej nesmie zhodit ostatne
-            [riadokAkcii, kartaZakazky, percentaKolacov, popisKarta, pocetZoznamu, pravyPanelPDA].forEach((f) => {
+            [usporiadajDetailMriezku, riadokAkcii, kartaZakazky, percentaKolacov, popisKarta, prekladHlavicky,
+             pocetZoznamu, pravyPanelPDA].forEach((f) => {
                 try { f(); } catch (e) { console.warn(LOG, 'novy dizajn:', f.name, e); }
             });
         }
