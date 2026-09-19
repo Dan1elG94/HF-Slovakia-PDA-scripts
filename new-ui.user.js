@@ -5014,22 +5014,27 @@ body.${BODY_CLASS} #__pda_hf_menu__ .hf-btn .n { font-size:14px !important; }
         /*
          * Karty pod riadkom akcii usporiadane do mriezky 2x2 namiesto pod
          * sebou: zakazka a material | SAP casy (hore), popis operacie |
-         * paralelne procesy (dole). #WorkcenterDetail--OrderDetails_FlexBox
-         * uz obsahuje SimpleForm_FlexBox (popis) a TimerCharts_FlexBox
-         * (kolace) - don sa este presunie Main_SimpleForm (bol vnutri
-         * OrderHeader_FlexBox, za riadkom akcii, ktory sa nedotyka) a
-         * Order_Info_Buttons_FlexBox (bol az za OrderDetails_FlexBox).
-         * Prvky sa len presuvaju (su zive, appka ich stale ovlada), su to
-         * ine ID, viditelne miesto v mriezke urcuje CSS cez grid-area,
-         * takze na poradi v DOM nezalezi.
+         * paralelne procesy (dole). CSS grid-column/grid-row funguje len na
+         * PRIAMYCH potomkoch #WorkcenterDetail--OrderDetails_FlexBox, preto
+         * sem musia byt presunute vsetky 4 karty - vratane TimerCharts_FlexBox,
+         * ktore povodne nie je jeho priamym dietaom, ale je zanorene o uroven
+         * hlbsie vnutri SimpleForm_FlexBox (za tlacidlom Popis operacie).
+         * Main_SimpleForm bol zas vnutri OrderHeader_FlexBox (za riadkom
+         * akcii, ktoreho sa toto nedotyka) a Order_Info_Buttons_FlexBox bol
+         * az za OrderDetails_FlexBox ako jeho vlastny súrodenec. Prvky sa len
+         * presuvaju (su zive, appka ich stale ovlada), viditelne miesto v
+         * mriezke urcuje CSS cez grid-column/grid-row podla ID, takze na
+         * poradi v DOM uz nezalezi.
          */
         function usporiadajDetailMriezku() {
             const grid = document.getElementById('WorkcenterDetail--OrderDetails_FlexBox');
             const zakazka = document.getElementById('WorkcenterDetail--Main_SimpleForm');
+            const casy = document.getElementById('WorkcenterDetail--TimerCharts_FlexBox');
             const paralelne = document.getElementById('WorkcenterDetail--Order_Info_Buttons_FlexBox');
-            if (!grid || !zakazka || !paralelne) return;
+            if (!grid || !zakazka || !casy || !paralelne) return;
             if (!grid.classList.contains('nd-detail-grid')) grid.classList.add('nd-detail-grid');
             if (zakazka.parentElement !== grid) grid.appendChild(zakazka);
+            if (casy.parentElement !== grid) grid.appendChild(casy);
             if (paralelne.parentElement !== grid) grid.appendChild(paralelne);
         }
 
