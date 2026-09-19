@@ -4662,29 +4662,31 @@ body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button .sapMBtnContent,
 body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button bdi { color:#fff !important; font-weight:800 !important; font-size:14px !important; }
 body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button .sapMBtnInner::before { content:'✓'; color:#fff; font-weight:900; margin-right:8px; }
 
-/* ---------- karta ZAKAZKA A MATERIAL: velky nazov materialu + jednotne
-   riadky popis/hodnota. Vsetkych 5 riadkov (3 zo SAP formulara + 2 vlastne)
-   je teraz rovnaky .nd-riadok flex riadok (popis vlavo max 33% tucne
-   doprava, hodnota vpravo dolava) - zive SAP prvky su tam presunute JS-om
-   (kartaZakazky()), povodny prazdny Layout kontajner je skryty nizsie.
-   Flexbox namiesto CSS grid + display:contents, ktore sa na cielovom
-   prehliadaci na presun grid polozok spravne neaplikovalo. ---------- */
+/* ---------- karta ZAKAZKA A MATERIAL: vsetkych 5 riadkov (3 zo SAP
+   formulara + 2 vlastne) jednoducho "Popis: hodnota" v jednom riadku,
+   bez stlpcov/mriezky - popis a hodnota su inline za sebou (popis tucny
+   + dvojbodka cez ::after, hodnota normalnym rezom hned za nim), cely
+   riadok sa prirodzene zalomi ako bezny text ak sa nezmesti na jeden
+   riadok. Zive SAP prvky su presunute do .nd-riadok JS-om (kartaZakazky()),
+   povodny prazdny Layout kontajner je skryty nizsie. ---------- */
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm { background:#fff !important; border:1px solid #e3ebf5 !important;
   border-radius:16px !important; padding:14px 18px !important; box-shadow:0 4px 14px rgba(16,36,63,.06) !important;
-  display:flex !important; flex-direction:column !important; gap:8px !important; }
+  display:flex !important; flex-direction:column !important; gap:6px !important; }
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm--Layout { display:none !important; }
-.nd-mat-title { font:800 20px/1.25 -apple-system,"Segoe UI",Roboto,sans-serif; color:#13315c; margin:0 0 2px; }
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok {
-  display:flex !important; align-items:baseline !important; gap:14px !important; width:100% !important;
-  box-sizing:border-box !important; margin:0 !important; }
+  display:block !important; width:100% !important; margin:0 !important; line-height:1.5 !important; }
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .sapMLabel,
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .k {
-  flex:0 0 33% !important; max-width:33% !important; text-align:right !important; font-weight:700 !important;
-  color:#4a6285 !important; box-sizing:border-box !important; width:auto !important; overflow-wrap:break-word !important; margin:0 !important; }
+  display:inline !important; font-weight:700 !important; color:#4a6285 !important;
+  max-width:none !important; width:auto !important; margin:0 !important; }
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok .sapMLabelColonAndRequired { display:none !important; }
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .sapMLabel::after,
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .k::after {
+  content:':' !important; }
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .sapMText,
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .v {
-  flex:1 1 auto !important; min-width:0 !important; text-align:left !important; font-weight:400 !important;
-  color:#13315c !important; max-width:none !important; overflow-wrap:break-word !important; margin:0 !important; }
+  display:inline !important; font-weight:400 !important; color:#13315c !important;
+  max-width:none !important; margin-left:6px !important; }
 
 /* ---------- mriezka pod riadkom akcii: zakazka+material | SAP casy (hore),
    popis operacie | paralelne procesy (dole) - namiesto povodneho radenia
@@ -4899,46 +4901,18 @@ body.${BODY_CLASS} #__pda_hf_menu__ .hf-btn .n { font-size:14px !important; }
         }
 
         /*
-         * Karta ZAKAZKA A MATERIAL: nad riadky formulara sa da velky nazov
-         * materialu (z riadku "Material": "25199513 - S-TRAVERZE ..." -> text za
-         * pomlckou) a pod ne dva riadky navyse z vybranej operacie: mnozstvo a
-         * pracovisko. Hodnoty appky sa nemenia, len sa dopisu nase prvky.
-         *
-         * Vsetkych 5 riadkov (3 zo SAP UI5 ResponsiveGrid formulara + 2
-         * vlastne) je zjednotenych do rovnakeho .nd-riadok flex riadku -
-         * popis vlavo (max 33% sirky, tucne, doprava), hodnota vpravo
-         * (dolava, normalne). Zive SAP prvky (label + span s hodnotou) sa
-         * len presuvaju (appka ich stale viaze), povodny Main_SimpleForm--
-         * Layout kontajner ostane v DOM prazdny a je skryty cez CSS
-         * (display:none) - spolahlivejsie nez display:contents, ktore sa
-         * na tomto zariadeni na grid polozky spravne neaplikovalo.
+         * Karta ZAKAZKA A MATERIAL: vsetkych 5 riadkov (3 zo SAP UI5
+         * ResponsiveGrid formulara - Zakaznicka zakazka/Material/Production
+         * Order + 2 vlastne - Mnozstvo/Pracovisko z vybranej operacie) sa
+         * zobrazuje jednotne, jednoducho "Popis: hodnota" v jednom riadku
+         * (bez stlpcov/mriezky). Zive SAP prvky (label + span s hodnotou)
+         * sa len presuvaju do spolocneho .nd-riadok wrappera (appka ich
+         * stale viaze), povodny Main_SimpleForm--Layout kontajner ostane v
+         * DOM prazdny a je skryty cez CSS (display:none).
          */
         function kartaZakazky() {
             const form = document.querySelector('#WorkcenterDetail--Main_SimpleForm .sapUiForm');
             if (!form) return;
-
-            // Nazov materialu sa cita priamo z pevneho ID hodnoty (nie cez
-            // closest() na povodny SAP riadok) - to zostava spolahlive aj
-            // po tom, co riadokZoSap() nizsie presunie label/hodnotu do
-            // vlastneho .nd-riadok wrappera.
-            let nazov = '';
-            const materialVal = document.getElementById('WorkcenterDetail--Material_Text');
-            if (materialVal) {
-                const t = (materialVal.textContent || '').trim();
-                const m = t.match(/^\S+\s*-\s*(.+)$/);
-                nazov = (m ? m[1] : t).trim();
-            }
-
-            let title = null;
-            for (const ch of form.children) { if (ch.classList.contains('nd-mat-title')) { title = ch; break; } }
-            if (nazov && nazov !== '-') {
-                if (!title) { title = document.createElement('div'); title.className = 'nd-mat-title'; }
-                if (title.textContent !== nazov) title.textContent = nazov;
-                form.appendChild(title);
-            } else if (title) {
-                title.remove();
-                title = null;
-            }
 
             // riadok zo zivych SAP prvkov (label + hodnota sa presunu do
             // spolocneho .nd-riadok wrappera, id drzi wrapper stabilny naprac apply()).
