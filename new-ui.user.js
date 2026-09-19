@@ -4662,37 +4662,29 @@ body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button .sapMBtnContent,
 body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button bdi { color:#fff !important; font-weight:800 !important; font-size:14px !important; }
 body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button .sapMBtnInner::before { content:'✓'; color:#fff; font-weight:900; margin-right:8px; }
 
-/* ---------- karta ZAKAZKA A MATERIAL: velky nazov materialu + 2-stlpcova
-   mriezka popis/hodnota. Povodna struktura mieša SAP UI5 ResponsiveGrid
-   riadky (Zakaznicka zakazka/Material/Production Order) s vlastnymi
-   .nd-extra/.nd-riadok riadkami (Mnozstvo/Pracovisko) - kazda ina hlbka
-   zanorenia. Namiesto prepisovania DOM stromu su vsetky "zbytocne"
-   medzi-wrappery (SAP UI5 grid bunky aj nase .nd-extra/.nd-riadok)
-   nastavene na display:contents, cim sa z layoutu vyradia a skutocne
-   popisky/hodnoty sa stanu priamymi polozkami jedineho grid kontajnera
-   (.sapUiForm), kde sa uz sami striedavo rozlozia do 2 stlpcov. ---------- */
+/* ---------- karta ZAKAZKA A MATERIAL: velky nazov materialu + jednotne
+   riadky popis/hodnota. Vsetkych 5 riadkov (3 zo SAP formulara + 2 vlastne)
+   je teraz rovnaky .nd-riadok flex riadok (popis vlavo max 33% tucne
+   doprava, hodnota vpravo dolava) - zive SAP prvky su tam presunute JS-om
+   (kartaZakazky()), povodny prazdny Layout kontajner je skryty nizsie.
+   Flexbox namiesto CSS grid + display:contents, ktore sa na cielovom
+   prehliadaci na presun grid polozok spravne neaplikovalo. ---------- */
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm { background:#fff !important; border:1px solid #e3ebf5 !important;
   border-radius:16px !important; padding:14px 18px !important; box-shadow:0 4px 14px rgba(16,36,63,.06) !important;
-  display:grid !important; grid-template-columns:minmax(0,33%) minmax(0,1fr) !important;
-  column-gap:14px !important; row-gap:8px !important; align-items:baseline !important; }
-.nd-mat-title { font:800 20px/1.25 -apple-system,"Segoe UI",Roboto,sans-serif; color:#13315c; margin:0 0 10px; }
-body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-mat-title { grid-column:1 / -1 !important; margin:0 0 4px !important; }
-body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .sapUiFormResGrid,
-body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .sapUiRespGrid,
-body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .sapUiRespGridRow,
-body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .sapUiFormElement,
-body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm [id*="-wrapperfor-"],
-body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-extra,
+  display:flex !important; flex-direction:column !important; gap:8px !important; }
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm--Layout { display:none !important; }
+.nd-mat-title { font:800 20px/1.25 -apple-system,"Segoe UI",Roboto,sans-serif; color:#13315c; margin:0 0 2px; }
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok {
-  display:contents !important; }
-body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .sapMLabel,
-body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-extra .k {
-  text-align:right !important; font-weight:700 !important; color:#4a6285 !important;
-  max-width:none !important; width:auto !important; overflow-wrap:break-word !important; margin:0 !important; }
-body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .sapMText,
-body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-extra .v {
-  text-align:left !important; font-weight:400 !important; color:#13315c !important;
-  max-width:none !important; overflow-wrap:break-word !important; margin:0 !important; }
+  display:flex !important; align-items:baseline !important; gap:14px !important; width:100% !important;
+  box-sizing:border-box !important; margin:0 !important; }
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .sapMLabel,
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .k {
+  flex:0 0 33% !important; max-width:33% !important; text-align:right !important; font-weight:700 !important;
+  color:#4a6285 !important; box-sizing:border-box !important; width:auto !important; overflow-wrap:break-word !important; margin:0 !important; }
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .sapMText,
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .v {
+  flex:1 1 auto !important; min-width:0 !important; text-align:left !important; font-weight:400 !important;
+  color:#13315c !important; max-width:none !important; overflow-wrap:break-word !important; margin:0 !important; }
 
 /* ---------- mriezka pod riadkom akcii: zakazka+material | SAP casy (hore),
    popis operacie | paralelne procesy (dole) - namiesto povodneho radenia
@@ -4911,56 +4903,85 @@ body.${BODY_CLASS} #__pda_hf_menu__ .hf-btn .n { font-size:14px !important; }
          * materialu (z riadku "Material": "25199513 - S-TRAVERZE ..." -> text za
          * pomlckou) a pod ne dva riadky navyse z vybranej operacie: mnozstvo a
          * pracovisko. Hodnoty appky sa nemenia, len sa dopisu nase prvky.
+         *
+         * Vsetkych 5 riadkov (3 zo SAP UI5 ResponsiveGrid formulara + 2
+         * vlastne) je zjednotenych do rovnakeho .nd-riadok flex riadku -
+         * popis vlavo (max 33% sirky, tucne, doprava), hodnota vpravo
+         * (dolava, normalne). Zive SAP prvky (label + span s hodnotou) sa
+         * len presuvaju (appka ich stale viaze), povodny Main_SimpleForm--
+         * Layout kontajner ostane v DOM prazdny a je skryty cez CSS
+         * (display:none) - spolahlivejsie nez display:contents, ktore sa
+         * na tomto zariadeni na grid polozky spravne neaplikovalo.
          */
         function kartaZakazky() {
             const form = document.querySelector('#WorkcenterDetail--Main_SimpleForm .sapUiForm');
             if (!form) return;
 
+            // Nazov materialu sa cita priamo z pevneho ID hodnoty (nie cez
+            // closest() na povodny SAP riadok) - to zostava spolahlive aj
+            // po tom, co riadokZoSap() nizsie presunie label/hodnotu do
+            // vlastneho .nd-riadok wrappera.
             let nazov = '';
-            form.querySelectorAll('.sapMLabel').forEach((lab) => {
-                if (nazov || !/materi/i.test(lab.textContent || '')) return;
-                const row = lab.closest('.sapUiFormElement') || lab.closest('.sapUiRespGridRow');
-                const val = row && row.querySelector('.sapMText');
-                const t = val ? (val.textContent || '').trim() : '';
+            const materialVal = document.getElementById('WorkcenterDetail--Material_Text');
+            if (materialVal) {
+                const t = (materialVal.textContent || '').trim();
                 const m = t.match(/^\S+\s*-\s*(.+)$/);
                 nazov = (m ? m[1] : t).trim();
-            });
+            }
 
             let title = null;
             for (const ch of form.children) { if (ch.classList.contains('nd-mat-title')) { title = ch; break; } }
             if (nazov && nazov !== '-') {
-                if (!title) {
-                    title = document.createElement('div');
-                    title.className = 'nd-mat-title';
-                    form.insertBefore(title, form.firstChild);
-                }
+                if (!title) { title = document.createElement('div'); title.className = 'nd-mat-title'; }
                 if (title.textContent !== nazov) title.textContent = nazov;
+                form.appendChild(title);
             } else if (title) {
                 title.remove();
+                title = null;
             }
+
+            // riadok zo zivych SAP prvkov (label + hodnota sa presunu do
+            // spolocneho .nd-riadok wrappera, id drzi wrapper stabilny naprac apply()).
+            function riadokZoSap(riadokId, label, value) {
+                if (!label || !value) { const stary = document.getElementById(riadokId); if (stary) stary.remove(); return; }
+                let r = document.getElementById(riadokId);
+                if (!r) { r = document.createElement('div'); r.id = riadokId; r.className = 'nd-riadok'; }
+                if (label.parentElement !== r) r.appendChild(label);
+                if (value.parentElement !== r) r.appendChild(value);
+                form.appendChild(r);
+            }
+            riadokZoSap('__pda_r_sales__', document.getElementById('WorkcenterDetail--SalesOrder_Label'),
+                        document.getElementById('WorkcenterDetail--SalesOrder_Text'));
+            riadokZoSap('__pda_r_material__', document.getElementById('WorkcenterDetail--Material_Label'),
+                        document.getElementById('WorkcenterDetail--Material_Text'));
+            riadokZoSap('__pda_r_prodorder__', document.getElementById('WorkcenterDetail--ProdOrder_Label'),
+                        document.getElementById('WorkcenterDetail--ProdOrder_Text'));
 
             const op = vybranaOperacia();
-            let extra = null;
-            for (const ch of form.children) { if (ch.classList.contains('nd-extra')) { extra = ch; break; } }
-            if (!op) { if (extra) extra.remove(); return; }
-
-            const kluc = [op.productionOrderNo, op.operationNo, op.sequenceNo, op.targetQuantity].join('|');
-            if (extra && extra.dataset.kluc === kluc) return;
-            if (!extra) { extra = document.createElement('div'); extra.className = 'nd-extra'; form.appendChild(extra); }
-            extra.dataset.kluc = kluc;
-            extra.textContent = '';
-            const riadky = [];
-            if (op.targetQuantity !== undefined && op.targetQuantity !== null && String(op.targetQuantity) !== '') {
-                riadky.push(['Množstvo', String(op.targetQuantity) + ' ks']);
+            function riadokVlastny(riadokId, k, v) {
+                if (!v) { const stary = document.getElementById(riadokId); if (stary) stary.remove(); return; }
+                let r = document.getElementById(riadokId);
+                if (!r) {
+                    r = document.createElement('div'); r.id = riadokId; r.className = 'nd-riadok';
+                    const kk = document.createElement('span'); kk.className = 'k';
+                    const vv = document.createElement('span'); vv.className = 'v';
+                    r.appendChild(kk); r.appendChild(vv);
+                }
+                const kk = r.querySelector('.k'), vv = r.querySelector('.v');
+                if (kk.textContent !== k) kk.textContent = k;
+                if (vv.textContent !== v) vv.textContent = v;
+                form.appendChild(r);
             }
+            if (!op) {
+                riadokVlastny('__pda_r_mnozstvo__', 'Množstvo', '');
+                riadokVlastny('__pda_r_pracovisko__', 'Pracovisko', '');
+                return;
+            }
+            const mnozstvo = (op.targetQuantity !== undefined && op.targetQuantity !== null && String(op.targetQuantity) !== '')
+                ? String(op.targetQuantity) + ' ks' : '';
+            riadokVlastny('__pda_r_mnozstvo__', 'Množstvo', mnozstvo);
             const prac = [op.workcenter, op.workcenterDescription].filter(Boolean).join(' - ');
-            if (prac) riadky.push(['Pracovisko', prac]);
-            riadky.forEach(([k, v]) => {
-                const r = document.createElement('div'); r.className = 'nd-riadok';
-                const kk = document.createElement('span'); kk.className = 'k'; kk.textContent = k;
-                const vv = document.createElement('span'); vv.className = 'v'; vv.textContent = v;
-                r.appendChild(kk); r.appendChild(vv); extra.appendChild(r);
-            });
+            riadokVlastny('__pda_r_pracovisko__', 'Pracovisko', prac);
         }
 
         /*
