@@ -4676,21 +4676,23 @@ body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm { background:#f
    len rozmiestnuju cez grid-area podla ID (poradie v DOM je jedno). ---------- */
 body.${BODY_CLASS} #WorkcenterDetail--OrderDetails_FlexBox.nd-detail-grid {
   display:grid !important; grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
-  grid-template-areas:"zakazka casy" "popis paralelne" !important;
+  grid-template-rows:auto auto !important;
   align-items:stretch !important; gap:12px !important;
   height:auto !important; width:100% !important; margin:0 0 10px !important; }
-body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm { grid-area:zakazka !important;
+/* explicitne riadok/stlpec namiesto grid-template-areas - odolnejsie voci
+   tomu, ci sa retazec s pomenovanymi oblastami spravne naparsuje */
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm { grid-column:1 !important; grid-row:1 !important;
   width:100% !important; max-width:none !important; height:auto !important; margin:0 !important; min-width:0 !important; }
-body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox { grid-area:casy !important;
+body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox { grid-column:2 !important; grid-row:1 !important;
   width:100% !important; height:auto !important; margin:0 !important; min-width:0 !important;
   background:#fff !important; border:1px solid #e3ebf5 !important; border-radius:16px !important;
   padding:10px 14px !important; box-shadow:0 4px 14px rgba(16,36,63,.06) !important; box-sizing:border-box !important;
   align-items:center !important; }
-body.${BODY_CLASS} #WorkcenterDetail--SimpleForm_FlexBox { grid-area:popis !important;
+body.${BODY_CLASS} #WorkcenterDetail--SimpleForm_FlexBox { grid-column:1 !important; grid-row:2 !important;
   width:100% !important; max-width:none !important; height:100% !important; margin:0 !important; min-width:0 !important; }
 body.${BODY_CLASS} #WorkcenterDetail--SimpleForm_FlexBox #__pda_opis_button__ { height:100% !important;
   margin:0 !important; max-width:none !important; box-sizing:border-box !important; align-content:start !important; }
-body.${BODY_CLASS} #WorkcenterDetail--Order_Info_Buttons_FlexBox { grid-area:paralelne !important;
+body.${BODY_CLASS} #WorkcenterDetail--Order_Info_Buttons_FlexBox { grid-column:2 !important; grid-row:2 !important;
   width:100% !important; height:100% !important; margin:0 !important; min-width:0 !important; }
 body.${BODY_CLASS} #WorkcenterDetail--Order_Info_Buttons_FlexBox .sapMList { background:#fff !important;
   border:1px solid #e3ebf5 !important; border-radius:16px !important; box-shadow:0 4px 14px rgba(16,36,63,.06) !important;
@@ -4698,6 +4700,16 @@ body.${BODY_CLASS} #WorkcenterDetail--Order_Info_Buttons_FlexBox .sapMList { bac
 body.${BODY_CLASS} #WorkcenterDetail--Order_Info_Buttons_FlexBox .sapMListHdrText { background:transparent !important;
   border:0 !important; font-size:12px !important; font-weight:800 !important; letter-spacing:.14em !important;
   text-transform:uppercase !important; color:#4a6285 !important; padding:12px 14px 6px !important; height:auto !important; }
+/* zoznam paralelnych procesov: odsadenie okolo poloziek */
+body.${BODY_CLASS} #WorkcenterDetail--OrderStatus_List-listUl { padding:12px !important; box-sizing:border-box !important; }
+/* jedna polozka zoznamu: meno vlavo, cas + Zastavit vpravo - jeden riadok
+   namiesto dvoch (predtym VBox: hore nazov+meno, dole cas+tlacidlo) */
+body.${BODY_CLASS} #WorkcenterDetail--OrderStatus_List-listUl .sapMFlexBoxFit.sapMVBox {
+  flex-direction:row !important; justify-content:space-between !important; align-items:center !important; }
+body.${BODY_CLASS} #WorkcenterDetail--OrderStatus_List-listUl [id^="WorkcenterDetail--Title_FlexBox-"] {
+  flex:1 1 auto !important; min-width:0 !important; }
+body.${BODY_CLASS} #WorkcenterDetail--OrderStatus_List-listUl [id^="WorkcenterDetail--Timer_FlexBox-"] {
+  flex:0 0 auto !important; margin-left:12px !important; }
 
 /* ---------- SAP casy: ploche kolace s percentom v strede a legendou ---------- */
 body.${BODY_CLASS} .pda-3d { transform:none !important; margin-top:6px !important;
