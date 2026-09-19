@@ -4662,13 +4662,37 @@ body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button .sapMBtnContent,
 body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button bdi { color:#fff !important; font-weight:800 !important; font-size:14px !important; }
 body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button .sapMBtnInner::before { content:'✓'; color:#fff; font-weight:900; margin-right:8px; }
 
-/* ---------- karta ZAKAZKA A MATERIAL: velky nazov materialu + riadky ---------- */
+/* ---------- karta ZAKAZKA A MATERIAL: velky nazov materialu + 2-stlpcova
+   mriezka popis/hodnota. Povodna struktura mieša SAP UI5 ResponsiveGrid
+   riadky (Zakaznicka zakazka/Material/Production Order) s vlastnymi
+   .nd-extra/.nd-riadok riadkami (Mnozstvo/Pracovisko) - kazda ina hlbka
+   zanorenia. Namiesto prepisovania DOM stromu su vsetky "zbytocne"
+   medzi-wrappery (SAP UI5 grid bunky aj nase .nd-extra/.nd-riadok)
+   nastavene na display:contents, cim sa z layoutu vyradia a skutocne
+   popisky/hodnoty sa stanu priamymi polozkami jedineho grid kontajnera
+   (.sapUiForm), kde sa uz sami striedavo rozlozia do 2 stlpcov. ---------- */
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm { background:#fff !important; border:1px solid #e3ebf5 !important;
-  border-radius:16px !important; padding:14px 18px !important; box-shadow:0 4px 14px rgba(16,36,63,.06) !important; }
+  border-radius:16px !important; padding:14px 18px !important; box-shadow:0 4px 14px rgba(16,36,63,.06) !important;
+  display:grid !important; grid-template-columns:minmax(0,33%) minmax(0,1fr) !important;
+  column-gap:14px !important; row-gap:8px !important; align-items:baseline !important; }
 .nd-mat-title { font:800 20px/1.25 -apple-system,"Segoe UI",Roboto,sans-serif; color:#13315c; margin:0 0 10px; }
-.nd-extra .nd-riadok { display:flex; gap:16px; font:14px/1.7 -apple-system,"Segoe UI",Roboto,sans-serif; }
-.nd-extra .k { flex:0 0 190px; color:#4a6285; }
-.nd-extra .v { color:#13315c; font-weight:600; }
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-mat-title { grid-column:1 / -1 !important; margin:0 0 4px !important; }
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .sapUiFormResGrid,
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .sapUiRespGrid,
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .sapUiRespGridRow,
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .sapUiFormElement,
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm [id*="-wrapperfor-"],
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-extra,
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok {
+  display:contents !important; }
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .sapMLabel,
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-extra .k {
+  text-align:right !important; font-weight:700 !important; color:#4a6285 !important;
+  max-width:none !important; width:auto !important; overflow-wrap:break-word !important; margin:0 !important; }
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .sapMText,
+body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-extra .v {
+  text-align:left !important; font-weight:400 !important; color:#13315c !important;
+  max-width:none !important; overflow-wrap:break-word !important; margin:0 !important; }
 
 /* ---------- mriezka pod riadkom akcii: zakazka+material | SAP casy (hore),
    popis operacie | paralelne procesy (dole) - namiesto povodneho radenia
