@@ -5128,7 +5128,17 @@ body.${BODY_CLASS} #__pda_hf_menu__ .hf-btn .n { font-size:14px !important; }
             patka();
 
             nadpisDo(document.getElementById('WorkcenterDetail--Order_Status_Flexbox'), 'Stav operácie', 'stav');
-            nadpisDo(document.getElementById('WorkcenterDetail--OrderHeader_FlexBox'), 'Zákazka a materiál', 'zakazka');
+            // Nadpis "Zákazka a materiál" ide priamo do karty (Main_SimpleForm--Form),
+            // rovnako ako "SAP časy" ide do TimerCharts_FlexBox - predtym isiel do
+            // OrderHeader_FlexBox, co uz nie je ta ista vizualna karta (Main_SimpleForm
+            // sa z neho medzicasom presunul do mriezky), takze nadpis visel mimo karty.
+            // Stary osirely nadpis (ak tam este ostal zo starsej verzie) sa odstrani.
+            const orderHeaderZvysok = document.getElementById('WorkcenterDetail--OrderHeader_FlexBox');
+            if (orderHeaderZvysok) {
+                const staryNadpis = orderHeaderZvysok.querySelector('[data-nd-nadpis="zakazka"]');
+                if (staryNadpis) staryNadpis.remove();
+            }
+            nadpisDo(document.getElementById('WorkcenterDetail--Main_SimpleForm--Form'), 'Zákazka a materiál', 'zakazka');
             nadpisDo(document.getElementById('WorkcenterDetail--TimerCharts_FlexBox'), 'SAP časy', 'casy');
 
             // kazda cast zvlast v try/catch - chyba v jednej nesmie zhodit ostatne
