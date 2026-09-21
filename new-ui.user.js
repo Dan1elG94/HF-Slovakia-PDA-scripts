@@ -4733,12 +4733,7 @@ body.${BODY_CLASS} #WorkcenterDetail--OrderStatus_List-listUl [id^="WorkcenterDe
 body.${BODY_CLASS} .pda-3d { transform:none !important; margin-top:6px !important;
   filter:drop-shadow(0 6px 10px rgba(16,36,63,.16)) !important; }
 body.${BODY_CLASS} .pda-3d:hover { transform:none !important; }
-/* obal presne na velkost platna - percenta sa doňho centruju cistym flexboxom
-   (position:absolute + inset:0), nie pocitanim pixelov podla okolia platna,
-   ktore pri sirsom/uzsom stlpci okolo neho vychadzalo mimo stred */
-.nd-canvas-wrap { position:relative; display:inline-flex; }
-.nd-pct { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center;
-  justify-content:center; text-align:center; pointer-events:none;
+.nd-pct { position:absolute; transform:translate(-50%,-50%); text-align:center; pointer-events:none;
   font-family:-apple-system,"Segoe UI",Roboto,sans-serif; }
 .nd-pct .c { display:block; font-size:22px; font-weight:800; color:#13315c; line-height:1; }
 .nd-pct .h { display:block; font-size:11px; color:#4a6285; margin-top:3px; }
@@ -4755,9 +4750,8 @@ body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox .sapMVBox { flex:1 1 0
 body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox .sapMLabel { order:1 !important; font-size:10.5px !important;
   letter-spacing:.08em !important; text-transform:uppercase !important; color:#4a6285 !important; font-weight:800 !important;
   margin:0 0 2px !important; }
-body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox .nd-canvas-wrap { order:2 !important; margin:2px 0 !important; }
-body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox canvas.pda-3d { width:120px !important; height:120px !important;
-  margin:0 !important; display:block !important; }
+body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox canvas.pda-3d { order:2 !important;
+  width:84px !important; height:84px !important; margin:2px auto !important; }
 body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox .sapMText { order:3 !important;
   font-size:11px !important; color:#6b7c95 !important; margin:2px 0 0 !important; }
 body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox .nd-legenda { display:none !important; }
@@ -4993,35 +4987,24 @@ body.${BODY_CLASS} #__pda_hf_menu__ .hf-btn .n { font-size:14px !important; }
                 });
                 if (!canvas || !canvas.parentElement) return;
 
-                /*
-                 * Percenta boli predtym pripinane pixelovo (stred platna =
-                 * jeho offsetLeft/Top + polovica rozmeru) voci celemu stlpcu
-                 * s nadpisom aj casom pod nim - pri inej sirke stlpca (napr.
-                 * po zmene sirky platna alebo mriezky) to vychadzalo mimo
-                 * stred. Miesto toho sa platno obali obalom presne na jeho
-                 * velkost a percenta sa doň vycentruju cistym flexboxom
-                 * (CSS .nd-canvas-wrap/.nd-pct) - vzdy presne v strede platna,
-                 * bez ohladu na okolie.
-                 */
-                let wrap = canvas.parentElement;
-                if (!wrap.classList.contains('nd-canvas-wrap')) {
-                    wrap = document.createElement('span');
-                    wrap.className = 'nd-canvas-wrap';
-                    canvas.parentElement.insertBefore(wrap, canvas);
-                    wrap.appendChild(canvas);
-                }
+                const par = canvas.parentElement;
+                if (par.style.position !== 'relative') par.style.position = 'relative';
                 let lbl = null;
-                for (const ch of wrap.children) { if (ch.classList.contains('nd-pct')) { lbl = ch; break; } }
+                for (const ch of par.children) { if (ch.classList.contains('nd-pct')) { lbl = ch; break; } }
                 if (!lbl) {
                     lbl = document.createElement('div'); lbl.className = 'nd-pct';
                     const c = document.createElement('span'); c.className = 'c';
                     const h = document.createElement('span'); h.className = 'h'; h.textContent = 'hotovo';
                     lbl.appendChild(c); lbl.appendChild(h);
-                    wrap.appendChild(lbl);
+                    par.appendChild(lbl);
                 }
                 const c = lbl.querySelector('.c');
                 const pctTxt = pct + '%';
                 if (c.textContent !== pctTxt) c.textContent = pctTxt;
+                const lx = Math.round(canvas.offsetLeft + canvas.offsetWidth / 2) + 'px';
+                const ly = Math.round(canvas.offsetTop + canvas.offsetHeight / 2) + 'px';
+                if (lbl.style.left !== lx) lbl.style.left = lx;
+                if (lbl.style.top !== ly) lbl.style.top = ly;
 
                 let leg = null;
                 for (const ch of box.children) { if (ch.classList.contains('nd-legenda')) { leg = ch; break; } }
