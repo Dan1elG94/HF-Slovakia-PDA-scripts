@@ -4543,7 +4543,7 @@ body.${BODY_CLASS} .statusBtn .sapMBtnContent, body.${BODY_CLASS} .statusBtn bdi
 /* ---------- nadpisy sekcii ---------- */
 .nd-nadpis { font:800 12px/1.3 -apple-system,"Segoe UI",Roboto,sans-serif; letter-spacing:.14em;
   text-transform:uppercase; color:#4a6285; margin:6px 0 8px 2px; }
-.nd-v-riadku { flex:0 0 100% !important; width:100% !important; box-sizing:border-box; margin:2px 0 6px 0 !important; }
+.nd-v-riadku { flex:0 0 100% !important; width:100% !important; box-sizing:border-box; margin:2px 0 6px 6px !important; }
 body.${BODY_CLASS} #WorkcenterDetail--Order_Status_Flexbox,
 body.${BODY_CLASS} #WorkcenterDetail--OrderHeader_FlexBox,
 body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox { flex-wrap:wrap !important; }
@@ -4678,7 +4678,7 @@ body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok {
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .sapMLabel,
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .k {
   display:inline !important; font-weight:700 !important; color:#4a6285 !important;
-  font-size:14px !important; max-width:none !important; width:auto !important; margin:0 !important; }
+  max-width:none !important; width:auto !important; margin:0 !important; }
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok .sapMLabelColonAndRequired { display:none !important; }
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .sapMLabel::after,
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .k::after {
@@ -4686,7 +4686,7 @@ body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .k
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .sapMText,
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .v {
   display:inline !important; font-weight:400 !important; color:#13315c !important;
-  font-size:14px !important; max-width:none !important; margin-left:6px !important; }
+  max-width:none !important; margin-left:6px !important; }
 
 /* ---------- mriezka pod riadkom akcii: zakazka+material | SAP casy (hore),
    popis operacie | paralelne procesy (dole) - namiesto povodneho radenia
@@ -4928,12 +4928,6 @@ body.${BODY_CLASS} #__pda_hf_menu__ .hf-btn .n { font-size:14px !important; }
                         document.getElementById('WorkcenterDetail--SalesOrder_Text'));
             riadokZoSap('__pda_r_material__', document.getElementById('WorkcenterDetail--Material_Label'),
                         document.getElementById('WorkcenterDetail--Material_Text'));
-
-            // "Production Order" -> "Výrobná zákazka" (len text v bdi, aby
-            // sa nerozbila vnutorna struktura labelu - dvojbodku aj tak
-            // pridava nase CSS ::after).
-            const prodOrderBdi = document.getElementById('WorkcenterDetail--ProdOrder_Label-bdi');
-            if (prodOrderBdi && prodOrderBdi.textContent !== 'Výrobná zákazka') prodOrderBdi.textContent = 'Výrobná zákazka';
             riadokZoSap('__pda_r_prodorder__', document.getElementById('WorkcenterDetail--ProdOrder_Label'),
                         document.getElementById('WorkcenterDetail--ProdOrder_Text'));
 
