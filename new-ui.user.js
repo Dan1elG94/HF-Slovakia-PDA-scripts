@@ -3974,9 +3974,14 @@ ${DIALOG_SEL} .pda-col-material { min-width:330px !important; }
                 b.querySelectorAll('canvas, svg').forEach((g) => {
                     if (MIMO.indexOf(g.id) !== -1) return;
                     if (g.classList.contains(TRIEDA)) return;
-                    // ikonky a drobnosti nechame tak, kolac je velky
-                    const r = g.getBoundingClientRect();
-                    if (r.width < 60 || r.height < 60) return;
+                    // ikonky a drobnosti nechame tak, kolac je velky - kontrolujeme
+                    // najprv kresliacu velkost canvasu (atribut width/height), lebo
+                    // aktualny CSS layout box vie byt chvilu po nacitani 0x0 (kym
+                    // sa okolity flex/grid layout este neustali), hoci canvas uz
+                    // realnu velkost ma.
+                    const velky = (g.tagName === 'CANVAS' && (g.width >= 60 || g.height >= 60)) ||
+                        g.getBoundingClientRect().width >= 60;
+                    if (!velky) return;
                     g.classList.add(TRIEDA);
                 });
 
@@ -4994,8 +4999,15 @@ body.${BODY_CLASS} #__pda_hf_menu__ .hf-btn .n { font-size:14px !important; }
                 if (!box) return;
                 let canvas = null;
                 box.querySelectorAll('canvas, svg').forEach((g) => {
-                    if (!canvas && g.id !== 'ResourceDetails' && g.id !== 'DialogChart' &&
-                        g.getBoundingClientRect().width >= 60) canvas = g;
+                    if (canvas || g.id === 'ResourceDetails' || g.id === 'DialogChart') return;
+                    // Kresliaca velkost canvasu (atribut width/height) je spolahlivejsia
+                    // nez aktualny CSS layout box - ten je chvilu po nacitani/prepnuti
+                    // operacie niekedy 0x0 (kym okolity flex/grid layout este nedobehol),
+                    // hoci canvas uz realnu velkost ma. Bez tejto zalohy sa graf vtedy
+                    // netrafil vobec a percenta sa nikdy nedokreslili.
+                    const velky = (g.tagName === 'CANVAS' && (g.width >= 60 || g.height >= 60)) ||
+                        g.getBoundingClientRect().width >= 60;
+                    if (velky) canvas = g;
                 });
                 if (!canvas || !canvas.parentElement) return;
 
@@ -5134,7 +5146,17 @@ body.${BODY_CLASS} #__pda_hf_menu__ .hf-btn .n { font-size:14px !important; }
             patka();
 
             nadpisDo(document.getElementById('WorkcenterDetail--Order_Status_Flexbox'), 'Stav operácie', 'stav');
-            nadpisDo(document.getElementById('WorkcenterDetail--OrderHeader_FlexBox'), 'Zákazka a materiál', 'zakazka');
+            // Nadpis "Zákazka a materiál" ide priamo do karty (Main_SimpleForm--Form),
+            // rovnako ako "SAP časy" ide do TimerCharts_FlexBox - predtym isiel do
+            // OrderHeader_FlexBox, co uz nie je ta ista vizualna karta (Main_SimpleForm
+            // sa z neho medzicasom presunul do mriezky), takze nadpis visel mimo karty.
+            // Stary osirely nadpis (ak tam este ostal zo starsej verzie) sa odstrani.
+            const orderHeaderZvysok = document.getElementById('WorkcenterDetail--OrderHeader_FlexBox');
+            if (orderHeaderZvysok) {
+                const staryNadpis = orderHeaderZvysok.querySelector('[data-nd-nadpis="zakazka"]');
+                if (staryNadpis) staryNadpis.remove();
+            }
+            nadpisDo(document.getElementById('WorkcenterDetail--Main_SimpleForm--Form'), 'Zákazka a materiál', 'zakazka');
             nadpisDo(document.getElementById('WorkcenterDetail--TimerCharts_FlexBox'), 'SAP časy', 'casy');
 
             // kazda cast zvlast v try/catch - chyba v jednej nesmie zhodit ostatne
