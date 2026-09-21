@@ -4751,7 +4751,7 @@ body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox .sapMLabel { order:1 !
   letter-spacing:.08em !important; text-transform:uppercase !important; color:#4a6285 !important; font-weight:800 !important;
   margin:0 0 2px !important; }
 body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox canvas.pda-3d { order:2 !important;
-  width:84px !important; height:84px !important; margin:2px auto !important; }
+  width:120px !important; height:120px !important; margin:2px auto !important; }
 body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox .sapMText { order:3 !important;
   font-size:11px !important; color:#6b7c95 !important; margin:2px 0 0 !important; }
 body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox .nd-legenda { display:none !important; }
