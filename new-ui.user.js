@@ -3978,9 +3978,12 @@ ${DIALOG_SEL} .pda-col-material { min-width:330px !important; }
                     // najprv kresliacu velkost canvasu (atribut width/height), lebo
                     // aktualny CSS layout box vie byt chvilu po nacitani 0x0 (kym
                     // sa okolity flex/grid layout este neustali), hoci canvas uz
-                    // realnu velkost ma.
-                    const velky = (g.tagName === 'CANVAS' && (g.width >= 60 || g.height >= 60)) ||
-                        g.getBoundingClientRect().width >= 60;
+                    // realnu velkost ma. Prah znizeny z 60 na 20 - appka niekedy
+                    // vykresli kolac aj len na 50x50 (uzsi stlpec v mriezke), box
+                    // je aj tak uz zuzeny na jeden konkretny kolac, takze nehrozi
+                    // zachytenie nejakej drobnej ikonky namiesto neho.
+                    const velky = (g.tagName === 'CANVAS' && (g.width >= 20 || g.height >= 20)) ||
+                        g.getBoundingClientRect().width >= 20;
                     if (!velky) return;
                     g.classList.add(TRIEDA);
                 });
@@ -5036,9 +5039,10 @@ body.${BODY_CLASS} #__pda_hf_menu__ .hf-btn .n { font-size:14px !important; }
                     // nez aktualny CSS layout box - ten je chvilu po nacitani/prepnuti
                     // operacie niekedy 0x0 (kym okolity flex/grid layout este nedobehol),
                     // hoci canvas uz realnu velkost ma. Bez tejto zalohy sa graf vtedy
-                    // netrafil vobec a percenta sa nikdy nedokreslili.
-                    const velky = (g.tagName === 'CANVAS' && (g.width >= 60 || g.height >= 60)) ||
-                        g.getBoundingClientRect().width >= 60;
+                    // netrafil vobec a percenta sa nikdy nedokreslili. Prah znizeny z 60
+                    // na 20 - appka niekedy vykresli kolac aj len na 50x50.
+                    const velky = (g.tagName === 'CANVAS' && (g.width >= 20 || g.height >= 20)) ||
+                        g.getBoundingClientRect().width >= 20;
                     if (velky) canvas = g;
                 });
                 if (!canvas || !canvas.parentElement) return;
