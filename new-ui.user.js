@@ -3974,17 +3974,9 @@ ${DIALOG_SEL} .pda-col-material { min-width:330px !important; }
                 b.querySelectorAll('canvas, svg').forEach((g) => {
                     if (MIMO.indexOf(g.id) !== -1) return;
                     if (g.classList.contains(TRIEDA)) return;
-                    // ikonky a drobnosti nechame tak, kolac je velky - kontrolujeme
-                    // najprv kresliacu velkost canvasu (atribut width/height), lebo
-                    // aktualny CSS layout box vie byt chvilu po nacitani 0x0 (kym
-                    // sa okolity flex/grid layout este neustali), hoci canvas uz
-                    // realnu velkost ma. Prah znizeny z 60 na 20 - appka niekedy
-                    // vykresli kolac aj len na 50x50 (uzsi stlpec v mriezke), box
-                    // je aj tak uz zuzeny na jeden konkretny kolac, takze nehrozi
-                    // zachytenie nejakej drobnej ikonky namiesto neho.
-                    const velky = (g.tagName === 'CANVAS' && (g.width >= 20 || g.height >= 20)) ||
-                        g.getBoundingClientRect().width >= 20;
-                    if (!velky) return;
+                    // ikonky a drobnosti nechame tak, kolac je velky
+                    const r = g.getBoundingClientRect();
+                    if (r.width < 60 || r.height < 60) return;
                     g.classList.add(TRIEDA);
                 });
 
@@ -4758,14 +4750,7 @@ body.${BODY_CLASS} .pda-3d:hover { transform:none !important; }
 
 /* ---------- SAP casy v karte: kompaktne kolace vedla seba (nadpis, potom
    maly kolac s percentom, cas pod nim), bez legendy - setri miesto v mriezke ---------- */
-/* flex:0 0 33.3333% (pevny percentualny zaklad) namiesto flex:1 1 0 - ten
-   zacina vypoctom od doslovne NULOVEJ sirky a az potom ju flex-grow
-   dopocita; ak appka odmeria kontajner grafu presne v tomto medzikroku
-   (skor, nez prehliadac dopocita rast), zapise si natrvalo canvas 0x0
-   (SAP uz sam od seba neskusi prekreslit). Percentualny zaklad sa
-   vypocita v jednom kroku, takze toto medzistavu nulovej sirky nema. */
-body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox .sapMVBox { flex:0 0 33.3333% !important;
-  width:33.3333% !important; min-width:0 !important; box-sizing:border-box !important;
+body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox .sapMVBox { flex:1 1 0 !important; min-width:0 !important;
   align-items:center !important; }
 body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox .sapMLabel { order:1 !important; font-size:10.5px !important;
   letter-spacing:.08em !important; text-transform:uppercase !important; color:#4a6285 !important; font-weight:800 !important;
@@ -4994,31 +4979,6 @@ body.${BODY_CLASS} #__pda_hf_menu__ .hf-btn .n { font-size:14px !important; }
             return isNaN(n) ? 0 : n;
         }
 
-        /*
-         * Poistka pre pripad, ze CSS oprava (pevny % zaklad namiesto flex:1 1 0)
-         * nestaci: appka meria kontajner grafu len RAZ pri jeho vytvoreni a
-         * vysledok (aj 0x0) si zapise natrvalo do atributov canvasu - uz sa
-         * sama neprekresli. Ak najdeme canvas so sirkou 0, hoci jeho obal uz
-         * realnu sirku ma, poslapkujeme "resize" event - ak appka na neho
-         * pocuva (bezny vzor pre responzivne grafy), prinuti ju znova zmerat
-         * a dokreslit. Najviac raz za sekundu, aby sa to nezaciklilo.
-         */
-        const GRAFY_CANVAS_ID = ['setupTimeChart', 'machineTimeChart', 'laborTimeChart'];
-        let poslednyResizeNudge = 0;
-        function obnovGrafyPoZmene() {
-            const potrebne = GRAFY_CANVAS_ID.some((id) => {
-                const c = document.getElementById(id);
-                if (!c || c.width !== 0) return false;
-                const obal = c.parentElement;
-                return !!(obal && obal.getBoundingClientRect().width > 40);
-            });
-            if (!potrebne) return;
-            const teraz = Date.now();
-            if (teraz - poslednyResizeNudge < 1000) return;
-            poslednyResizeNudge = teraz;
-            W.dispatchEvent(new Event('resize'));
-        }
-
         function percentaKolacov() {
             KOTVY_CASOV.forEach((id) => {
                 const text = document.getElementById(id);
@@ -5034,16 +4994,8 @@ body.${BODY_CLASS} #__pda_hf_menu__ .hf-btn .n { font-size:14px !important; }
                 if (!box) return;
                 let canvas = null;
                 box.querySelectorAll('canvas, svg').forEach((g) => {
-                    if (canvas || g.id === 'ResourceDetails' || g.id === 'DialogChart') return;
-                    // Kresliaca velkost canvasu (atribut width/height) je spolahlivejsia
-                    // nez aktualny CSS layout box - ten je chvilu po nacitani/prepnuti
-                    // operacie niekedy 0x0 (kym okolity flex/grid layout este nedobehol),
-                    // hoci canvas uz realnu velkost ma. Bez tejto zalohy sa graf vtedy
-                    // netrafil vobec a percenta sa nikdy nedokreslili. Prah znizeny z 60
-                    // na 20 - appka niekedy vykresli kolac aj len na 50x50.
-                    const velky = (g.tagName === 'CANVAS' && (g.width >= 20 || g.height >= 20)) ||
-                        g.getBoundingClientRect().width >= 20;
-                    if (velky) canvas = g;
+                    if (!canvas && g.id !== 'ResourceDetails' && g.id !== 'DialogChart' &&
+                        g.getBoundingClientRect().width >= 60) canvas = g;
                 });
                 if (!canvas || !canvas.parentElement) return;
 
@@ -5196,7 +5148,7 @@ body.${BODY_CLASS} #__pda_hf_menu__ .hf-btn .n { font-size:14px !important; }
             nadpisDo(document.getElementById('WorkcenterDetail--TimerCharts_FlexBox'), 'SAP časy', 'casy');
 
             // kazda cast zvlast v try/catch - chyba v jednej nesmie zhodit ostatne
-            [usporiadajDetailMriezku, riadokAkcii, kartaZakazky, percentaKolacov, obnovGrafyPoZmene, popisKarta, prekladHlavicky,
+            [usporiadajDetailMriezku, riadokAkcii, kartaZakazky, percentaKolacov, popisKarta, prekladHlavicky,
              pocetZoznamu, pravyPanelPDA].forEach((f) => {
                 try { f(); } catch (e) { console.warn(LOG, 'novy dizajn:', f.name, e); }
             });
