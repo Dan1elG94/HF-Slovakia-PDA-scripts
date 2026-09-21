@@ -4507,8 +4507,14 @@ ${DIALOG_SEL} .pda-col-material { min-width:330px !important; }
 /* Pozadie HF Slovakia (navrh 3 z 2026-09-16) je vlozene priamo v skripte, aby
    nezaviselo od siete; svetlomodry prechod pod nim je zaloha, keby sa
    obrazok z akehokolvek dovodu nevykreslil. Obrazok je len na <body>,
-   vnutorne kontajnery appky su priehladne - inak by sa kreslil viackrat. */
-body.${BODY_CLASS} { background:url(${POZADIE}) center / cover no-repeat fixed,
+   vnutorne kontajnery appky su priehladne - inak by sa kreslil viackrat.
+   Vynimka je #Application - SAP naň priamo vo svojom CSS vnucuje vlastne
+   pozadie (background-image:url(...) !important), ktore je nad <body> a
+   nase pozadie by tak celkom prekrylo. Preto musi mat aj #Application
+   rovnaky obrazok priamo (selektor s BODY_CLASS ma vyssiu specificitu
+   1 trieda + 1 ID nez SAP-acke holé #Application, takze pri rovnakom
+   !important vyhrava nas zapis). */
+body.${BODY_CLASS}, body.${BODY_CLASS} #Application { background:url(${POZADIE}) center / cover no-repeat fixed,
   linear-gradient(135deg,#eaf2fb 0%,#dbe8f7 55%,#e9f1fb 100%) !important; }
 body.${BODY_CLASS} .sapUiBody, body.${BODY_CLASS} .sapMShell, body.${BODY_CLASS} .sapMPage,
 body.${BODY_CLASS} .sapMPageBgStandard, body.${BODY_CLASS} .sapMPageBgSolid,
