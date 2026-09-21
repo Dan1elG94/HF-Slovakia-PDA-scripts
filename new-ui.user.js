@@ -4521,7 +4521,12 @@ body.${BODY_CLASS} .sapMPageBgStandard, body.${BODY_CLASS} .sapMPageBgSolid,
 body.${BODY_CLASS} .sapMNav, body.${BODY_CLASS} .sapMApp { background:transparent !important; }
 body.${BODY_CLASS} .sapMPanel { background:#fff !important; border:1px solid #e3ebf5 !important;
   border-radius:18px !important; box-shadow:0 4px 18px rgba(16,36,63,.08) !important;
-  margin:10px 12px !important; box-sizing:border-box !important; }
+  margin:10px 12px !important; box-sizing:border-box !important;
+  /* SAP dava panelu fixnu sirku (px, vypocitanu este pred nasim marginom),
+     takze pridany horizontalny margin sa k nej len pripocital a panel
+     vytekal z prava. width:calc si od 100% sirky rodica odpocita presne
+     nase dva 12px marginy, takze panel aj s marginmi sedi presne do rodica. */
+  width:calc(100% - 24px) !important; max-width:calc(100% - 24px) !important; }
 body.${BODY_CLASS} .sapMPanelHdr, body.${BODY_CLASS} .sapMPanelHeaderTB {
   background:transparent !important; border:0 !important; }
 body.${BODY_CLASS} .sapMPanelHdr .sapMTitle, body.${BODY_CLASS} .sapMPanelHdr .sapMText {
