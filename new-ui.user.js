@@ -4522,7 +4522,12 @@ body.${BODY_CLASS}, body.${BODY_CLASS} #Application { background:url(${POZADIE})
   linear-gradient(135deg,#eaf2fb 0%,#dbe8f7 55%,#e9f1fb 100%) !important; }
 body.${BODY_CLASS} .sapUiBody, body.${BODY_CLASS} .sapMShell, body.${BODY_CLASS} .sapMPage,
 body.${BODY_CLASS} .sapMPageBgStandard, body.${BODY_CLASS} .sapMPageBgSolid,
-body.${BODY_CLASS} .sapMNav, body.${BODY_CLASS} .sapMApp { background:transparent !important; }
+body.${BODY_CLASS} .sapMNav, body.${BODY_CLASS} .sapMApp,
+body.${BODY_CLASS} .sapMTB { background:transparent !important; }
+/* sapUiBody sedi na samotnom <body>, takze ho horny (potomkovsky) selektor
+   nikdy nechyti. Rusime tu preto len farbu - obrazok pozadia z pravidla
+   body.${BODY_CLASS} musi ostat, inak by sme si ho zhodili. */
+body.${BODY_CLASS}.sapUiBody { background-color:transparent !important; }
 body.${BODY_CLASS} .sapMPanel { background:rgba(255,255,255,.8) !important; border:1px solid #e3ebf5 !important;
   border-radius:18px !important; box-shadow:0 4px 18px rgba(16,36,63,.08) !important;
   margin:10px 12px !important; box-sizing:border-box !important;
@@ -4570,8 +4575,9 @@ body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox { flex-wrap:wrap !impo
 
 /* ---------- pravy stlpec appky ---------- */
 body.${BODY_CLASS} #WorkcenterDetail--Order_Status_Flexbox {
-  background:#fff !important; border:0 !important; box-shadow:none !important;
-  padding:0 !important; }
+  background:#fff !important; border:1px solid #e3ebf5 !important;
+  box-shadow:0 4px 14px rgba(16,36,63,.06) !important;
+  padding:10px 14px !important; box-sizing:border-box !important; }
 
 /* ---------- patka ---------- */
 #${FOOTER_ID} { position:fixed; left:0; right:0; bottom:0; height:34px; z-index:4;
