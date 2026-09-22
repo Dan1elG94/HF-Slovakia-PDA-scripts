@@ -3620,6 +3620,9 @@ ${DIALOG_SEL} .pda-col-material { min-width:330px !important; }
             const st = document.createElement('style');
             st.id = STYLE_ID;
             st.textContent = `
+/* box so zakazkou: SAP mu kresli vlastny ram zlava - nepotrebujeme ho */
+#${ORDER_ID} { border-left:0 !important; }
+
 /* cely riadok hlavicky: prepinac, vykres a tlacidlo vedla seba, zvisle na stred */
 #${HEADER_ID} { align-items:center !important; gap:12px !important; padding:4px 8px 2px !important; }
 
@@ -4529,7 +4532,8 @@ body.${BODY_CLASS} .sapMPanel { background:rgba(255,255,255,.8) !important; bord
   width:calc(100% - 24px) !important; max-width:calc(100% - 24px) !important; }
 /* vnutorne obaly panelu od SAP maju vlastne plne pozadie - lezia nad panelom,
    takze by jeho priehladnost (alfa .8) uplne prekryli */
-body.${BODY_CLASS} .sapMPanelWrappingDiv, body.${BODY_CLASS} .sapMPanelWrappingDivTb {
+body.${BODY_CLASS} .sapMPanelWrappingDiv, body.${BODY_CLASS} .sapMPanelWrappingDivTb,
+body.${BODY_CLASS} .sapMPanelContent, body.${BODY_CLASS} .sapMPanelBGSolid {
   background:transparent !important; }
 body.${BODY_CLASS} .sapMPanelHdr, body.${BODY_CLASS} .sapMPanelHeaderTB {
   background:transparent !important; border:0 !important; }
