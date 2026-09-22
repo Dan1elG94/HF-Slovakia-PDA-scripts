@@ -4714,13 +4714,18 @@ body.${BODY_CLASS} #__pda_order_drawing_wrapper__ > button { border:1px solid #d
 /* Components/BOM: rovnako vysoke ako VYKRES. Nedavame pevnu vysku - v riadku
    sa len natiahne (align-self:stretch) na vysku najvyssieho prvku, a to je
    prave tlacidlo VYKRES (trojriadkove). Ak sa VYKRES zmeni, BOM ide s nim. */
-body.${BODY_CLASS} #__pda_detail_rightcol__ .nd-bom {
+/* Popri triede sa cielime aj cez ID: pri prekresleni po nacitani zakazky
+   UI5 na chvilu prepise class a tlacidlo by inak blyslo v povodnej sirke,
+   kym mu DomWatch triedu vrati. ID si UI5 nemeni. */
+body.${BODY_CLASS} #__pda_detail_rightcol__ .nd-bom,
+body.${BODY_CLASS} #__pda_detail_rightcol__ #WorkcenterDetail--BoM_Button {
   align-self:stretch !important; flex:0 0 220px !important;
   width:220px !important; min-width:0 !important;
   padding:0 !important; box-sizing:border-box !important; }
 /* Ram, tien a pozadie kresli vnutorny .sapMBtnInner, nie samotne tlacidlo -
    preto musi vyplnit cele tlacidlo, inak by ramcek obopinal len text. */
-body.${BODY_CLASS} .nd-bom .sapMBtnInner { background:#fff !important; border:1px solid #dfe7f2 !important; border-radius:12px !important;
+body.${BODY_CLASS} .nd-bom .sapMBtnInner,
+body.${BODY_CLASS} #WorkcenterDetail--BoM_Button .sapMBtnInner { background:#fff !important; border:1px solid #dfe7f2 !important; border-radius:12px !important;
   padding:0 !important; box-shadow:0 2px 8px rgba(16,36,63,.08) !important; color:#13315c !important; font-weight:700 !important;
   height:100% !important; width:100% !important; box-sizing:border-box !important;
   display:flex !important; align-items:center !important; justify-content:center !important; }
@@ -4956,9 +4961,18 @@ body.${BODY_CLASS} #__pda_hf_menu__ .hf-btn .n { font-size:14px !important; }
             if (ciel !== col) header.insertBefore(col, ciel);
 
             document.querySelectorAll('.sapMBtn').forEach((b) => {
-                if (col.contains(b) || b.closest('.sapMDialog')) return;
+                if (b.closest('.sapMDialog')) return;
                 if (!/^components/i.test((b.textContent || '').trim())) return;
+                /*
+                 * Triedu dopisujeme pri KAZDOM behu, nie len pri presune.
+                 * UI5 si po nacitani zakazky tlacidlo prekresli a pritom
+                 * prepise cely atribut class podla vlastneho zoznamu tried -
+                 * nasa nd-bom z neho vypadne, hoci tlacidlo v riadku zostane.
+                 * Predtym tu bola podmienka "ak uz je v riadku, preskoc", cize
+                 * sa trieda nikdy nevratila a tlacidlu spadla sirka aj vyska.
+                 */
                 if (!b.classList.contains('nd-bom')) b.classList.add('nd-bom');
+                if (col.contains(b)) return;   // presuva sa len raz, uz je na mieste
                 const kotva = col.querySelector('.pda-machine');
                 col.insertBefore(b, kotva || null);
             });
