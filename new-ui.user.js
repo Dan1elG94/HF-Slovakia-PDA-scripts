@@ -2454,10 +2454,8 @@ body.${BODY_CLASS} #${PANEL_ID} .sapMPanelContent > :not(#${OVERVIEW_ID}) { disp
         const TIP_ID = '__pda_pill_tip__';
         const BOX1_ID = '__pda_left_box_zoznam__';
         const BOX2_ID = '__pda_left_box_graf__';
-        const MIN_HEIGHT = 240;       // pod tuto vysku zoznam nikdy nestlacime
-        const BOTTOM_GAP = 18;        // medzera pod lavym stlpcom
+        const VYSKA_ZOZNAMU = 520;    // pevna vyska posuvneho zoznamu zakaziek (px)
 
-        let missingLeftLogged = false;
         let poslednyPodpis = '';
         let poslednyResize = 0;
 
@@ -2478,38 +2476,43 @@ body.${BODY_CLASS} #${PANEL_ID} .sapMPanelContent > :not(#${OVERVIEW_ID}) { disp
 /* zaoblene hrany hore aj dole - vidno, kde posuvny zoznam konci */
 #${SCROLL_ID} { border:0 !important; background:transparent !important; border-radius:14px !important; }
 #${LIST_ID} { background:transparent !important; }
-/* kazdy zaznam = samostatna pilulka s plnym, jemnym ale viditelnym ramom;
-   pozadie sa strieda (biela / svetlomodra), aby bolo vidiet, kde jedna konci */
-/* pilulka je siroka len tolko, kolko treba - vpravo uz neostava prazdny pas */
+/* Zaznam je plochy riadok cez celu sirku zoznamu, oddeleny len tenkou linkou -
+   uz nie samostatna karta s ramom a striedavym podfarbenim. Text je v troch
+   riadkoch: vyrobna zakazka (tucne), zakaznicka zakazka, material. */
 #${LIST_ID} .sapMLIB.pda-pill-on { min-height:0 !important; height:auto !important; padding:0 !important;
-  margin:4px 3px !important; border:1px solid #c3cfe0 !important; border-radius:10px !important;
-  background:#fff !important; overflow:hidden; transition:border-color .12s, box-shadow .12s;
-  width:max-content !important; max-width:calc(100% - 10px) !important; }
-#${LIST_ID} .sapMLIB.pda-pill-on:nth-child(even) { background:#eef3fa !important; }
-#${LIST_ID} .sapMLIB.pda-pill-on:hover { border-color:#7ba4ee !important; box-shadow:0 3px 10px rgba(16,36,63,.12) !important; }
-/* vybrana zakazka: tmavomodra na bielo - nedá sa zamenit so striedavym podfarbenim */
-#${LIST_ID} .sapMLIB.pda-pill-on.sapMLIBSelected,
-#${LIST_ID} .sapMLIB.pda-pill-on.sapMLIBSelected:nth-child(even) { border:2px solid #0b2447 !important;
-  background:#13315c !important; box-shadow:0 3px 12px rgba(19,49,92,.35) !important; }
-#${LIST_ID} .sapMLIB.pda-pill-on.sapMLIBSelected .pda-pill { color:#fff; }
-#${LIST_ID} .sapMLIB.pda-pill-on.sapMLIBSelected .t-vyr { background:#fff; color:#13315c; }
-#${LIST_ID} .sapMLIB.pda-pill-on.sapMLIBSelected .t-zak { background:#2f5fa8; color:#fff; border-color:#5b87cc; }
-#${LIST_ID} .sapMLIB.pda-pill-on.sapMLIBSelected .mat { color:#fff; }
-#${LIST_ID} .sapMLIB.pda-pill-on.sapMLIBSelected .matn { color:#c9d8ef; }
+  margin:0 !important; border:0 !important; border-bottom:1px solid #e6ecf5 !important;
+  border-radius:0 !important; background:transparent !important; overflow:hidden;
+  transition:background-color .12s; width:100% !important; max-width:100% !important; }
+#${LIST_ID} .sapMLIB.pda-pill-on:last-child { border-bottom:0 !important; }
+#${LIST_ID} .sapMLIB.pda-pill-on:hover { background:#eef3fa !important; }
+/* vybrana zakazka: plna modra na bielo */
+#${LIST_ID} .sapMLIB.pda-pill-on.sapMLIBSelected { background:#0b63ce !important;
+  border-bottom-color:#0b63ce !important; }
+#${LIST_ID} .sapMLIB.pda-pill-on.sapMLIBSelected .pda-pill,
+#${LIST_ID} .sapMLIB.pda-pill-on.sapMLIBSelected .t-vyr,
+#${LIST_ID} .sapMLIB.pda-pill-on.sapMLIBSelected .t-zak,
+#${LIST_ID} .sapMLIB.pda-pill-on.sapMLIBSelected .mat { color:#fff !important; }
+#${LIST_ID} .sapMLIB.pda-pill-on.sapMLIBSelected .matn { color:#d3e3f8 !important; }
 #${LIST_ID} .sapMLIB.pda-pill-on > *:not([data-pda-pill]) { display:none !important; }
-.pda-pill { padding:5px 9px; font:12px/1.25 -apple-system,"Segoe UI",Roboto,sans-serif; color:#1a2233; }
+.pda-pill { padding:8px 12px; font:12px/1.3 -apple-system,"Segoe UI",Roboto,sans-serif; color:#1a2233; }
+/* prave bezi - zeleny prizvuk pri lavom okraji riadku */
 .pda-pill.run { box-shadow: inset 4px 0 0 #2e9e4f; }
-.pda-pill .r1 { display:flex; align-items:center; gap:5px; flex-wrap:nowrap; overflow:hidden; }
+/* r1 sa zalamuje: na prvom riadku vyrobna zakazka a vpravo zeleny tag,
+   zakaznicka zakazka sa cez flex-basis:100% pretlaci na vlastny riadok
+   (v DOM je pritom medzi nimi - preto to poradie riesi "order") */
+.pda-pill .r1 { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 .pda-pill .r2 { display:flex; align-items:baseline; gap:5px; margin-top:2px; overflow:hidden; white-space:nowrap; }
-.pda-pill .t { display:inline-block; padding:1px 7px; border-radius:999px; font-size:11.5px; font-weight:700;
+/* zo vsetkych troch textov robime obycajny text - tag ostava len z "vyrába" */
+.pda-pill .t { display:inline-block; padding:0; border-radius:0; background:none; border:0;
   white-space:nowrap; letter-spacing:0; line-height:1.35; }
-.pda-pill .t-vyr { background:#13315c; color:#fff; }
-.pda-pill .t-zak { background:#dfeafc; color:#1b4f9c; border:1px solid #b9cdee; }
-.pda-pill .t-run { background:#e7f6ec; color:#1d7a3c; border:1px solid #b6e2c5; margin-left:auto; }
-.pda-pill .mat { font-size:11.5px; font-weight:700; color:#0f172a; white-space:nowrap; }
-.pda-pill .matn { font-size:11.5px; color:#4a5568; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1 1 auto; min-width:0; }
-.pda-pill .t-vyr { flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; }
-.pda-pill .t-zak { flex:0 0 auto; }
+.pda-pill .t-vyr { order:1; font-size:13px; font-weight:700; color:#0f2547;
+  flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; }
+.pda-pill .t-zak { order:3; flex:0 0 100%; font-size:12px; font-weight:400; color:#5a6b85; }
+.pda-pill .t-run { order:2; margin-left:auto; flex:0 0 auto;
+  background:#e7f6ec; color:#1d7a3c; border:1px solid #b6e2c5;
+  padding:1px 8px; border-radius:999px; font-size:11px; font-weight:700; }
+.pda-pill .mat { font-size:11.5px; font-weight:600; color:#6b7c95; white-space:nowrap; }
+.pda-pill .matn { font-size:11.5px; color:#6b7c95; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1 1 auto; min-width:0; }
 /* bublina s celym obsahom zakazky */
 #${TIP_ID} { display:none; position:fixed; z-index:100001; pointer-events:none;
   background:#fff; border:1px solid #b9cbe8; border-radius:10px; padding:10px 12px;
@@ -2734,32 +2737,17 @@ body.${BODY_CLASS} #${PANEL_ID} .sapMPanelContent > :not(#${OVERVIEW_ID}) { disp
         }
 
         /*
-         * Vyska zoznamu: od jeho horneho okraja az po spodok obrazovky, minus to,
-         * co je v lavom stlpci pod nim (graf "Resource over time"). Zvysok sa
-         * pocita ako "cely lavy stlpec minus zoznam", takze nezavisi od toho,
-         * ako vysoky zoznam prave je - nemoze sa to rozkmitat.
+         * Vyska zoznamu je PEVNA (VYSKA_ZOZNAMU). Predtym sa dopocitavala z volneho
+         * miesta pod zoznamom az po spodok stlpca, takze sa menila podla toho, co
+         * bolo v stlpci pod nim a ako vysoke prave bolo okno. Appka si vysku pise
+         * inline, preto ju tu prepisujeme my - a len ked naozaj sedi ina hodnota,
+         * aby sa DOM nesahal pri kazdom tiku.
          */
         function fitHeight() {
             const sc = document.getElementById(SCROLL_ID);
             if (!sc || !sc.offsetParent) return;
-            const left = document.getElementById(LEFT_ID);
-            if (!left) {
-                if (!missingLeftLogged) {
-                    missingLeftLogged = true;
-                    console.log(LOG, 'ľavý stĺpec detailu sa nenašiel, výšku zoznamu nemením');
-                }
-                return;
-            }
-            const top = sc.getBoundingClientRect().top;
-            if (top <= 0) return;
-            const podZoznamom = Math.max(0, left.scrollHeight - sc.offsetHeight);
-            // ked je stlpec pripnuty na celu vysku (modul fullLeft), meriame po jeho
-            // skutocny spodok, nie po spodok okna - inak by zoznam koncil privysoko
-            const spodok = left.classList.contains('pda-layout-left')
-                ? left.getBoundingClientRect().bottom
-                : W.innerHeight;
-            const ciel = Math.round(Math.max(MIN_HEIGHT, spodok - top - podZoznamom - BOTTOM_GAP));
-            if (Math.abs(ciel - sc.offsetHeight) > 8) sc.style.height = ciel + 'px';
+            const ciel = VYSKA_ZOZNAMU + 'px';
+            if (sc.style.height !== ciel) sc.style.height = ciel;
         }
 
         /*
