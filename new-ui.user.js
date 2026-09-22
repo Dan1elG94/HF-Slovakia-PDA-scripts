@@ -3680,12 +3680,16 @@ ${DIALOG_SEL} .pda-col-material { min-width:330px !important; }
  * do oci. Teraz je oboje na .sapMBtnInner a tien je zladeny s cervenou.
  * Cervena #e53935 je rovnaka, aka sa pouziva inde v skripte.
  */
-.pda-aktivita .sapMBtn { border-radius:999px !important; box-shadow:none !important;
+.pda-aktivita .sapMBtn { border-radius:10px !important; box-shadow:none !important;
   margin:0 !important; }
-.pda-aktivita .sapMBtn .sapMBtnInner { border-radius:999px !important; padding:7px 18px !important;
+.pda-aktivita .sapMBtn .sapMBtnInner { border-radius:10px !important; padding:7px 18px !important;
   background:#e53935 !important; background-image:none !important;
   border:1px solid #e53935 !important;
-  box-shadow:0 2px 6px rgba(229,57,53,.35) !important; }
+  box-shadow:0 2px 6px rgba(229,57,53,.35) !important;
+  /* bez flexu sedi ikona s textom pri lavom okraji, nie v strede */
+  display:flex !important; align-items:center !important; justify-content:center !important;
+  box-sizing:border-box !important; }
+.pda-aktivita .sapMBtn .sapMBtnContent { justify-content:center !important; text-align:center !important; }
 .pda-aktivita .sapMBtn .sapMBtnContent,
 .pda-aktivita .sapMBtn bdi,
 .pda-aktivita .sapMBtn .sapUiIcon { color:#fff !important; }
@@ -4814,9 +4818,14 @@ body.${BODY_CLASS} #WorkcenterDetail--Order_Info_Buttons_FlexBox { grid-column:2
 body.${BODY_CLASS} #WorkcenterDetail--Order_Info_Buttons_FlexBox .sapMList { background:#fff !important;
   border:1px solid #e3ebf5 !important; border-radius:16px !important; box-shadow:0 4px 14px rgba(16,36,63,.06) !important;
   height:100% !important; box-sizing:border-box !important; overflow:hidden !important; }
+/* rovnaky nadpis ako .nd-nadpis ("SAP casy"). Dolezity je line-height:
+   SAP dava hlavicke zoznamu vysoky pevny riadok (3rem), takze aj po
+   height:auto ostal nadpis opticky zapichnuty v prazdnom pase. */
 body.${BODY_CLASS} #WorkcenterDetail--Order_Info_Buttons_FlexBox .sapMListHdrText { background:transparent !important;
   border:0 !important; font-size:12px !important; font-weight:800 !important; letter-spacing:.14em !important;
-  text-transform:uppercase !important; color:#4a6285 !important; padding:12px 14px 6px !important; height:auto !important; }
+  line-height:1.3 !important; text-transform:uppercase !important; color:#4a6285 !important;
+  font-family:-apple-system,"Segoe UI",Roboto,sans-serif !important;
+  padding:12px 14px 8px !important; height:auto !important; min-height:0 !important; }
 /* zoznam paralelnych procesov: odsadenie okolo poloziek */
 body.${BODY_CLASS} #WorkcenterDetail--OrderStatus_List-listUl { padding:12px !important; box-sizing:border-box !important; }
 /* jedna polozka zoznamu: meno vlavo, cas + Zastavit vpravo - jeden riadok
