@@ -4527,6 +4527,10 @@ body.${BODY_CLASS} .sapMPanel { background:rgba(255,255,255,.8) !important; bord
      vytekal z prava. width:calc si od 100% sirky rodica odpocita presne
      nase dva 12px marginy, takze panel aj s marginmi sedi presne do rodica. */
   width:calc(100% - 24px) !important; max-width:calc(100% - 24px) !important; }
+/* vnutorne obaly panelu od SAP maju vlastne plne pozadie - lezia nad panelom,
+   takze by jeho priehladnost (alfa .8) uplne prekryli */
+body.${BODY_CLASS} .sapMPanelWrappingDiv, body.${BODY_CLASS} .sapMPanelWrappingDivTb {
+  background:transparent !important; }
 body.${BODY_CLASS} .sapMPanelHdr, body.${BODY_CLASS} .sapMPanelHeaderTB {
   background:transparent !important; border:0 !important; }
 body.${BODY_CLASS} .sapMPanelHdr .sapMTitle, body.${BODY_CLASS} .sapMPanelHdr .sapMText {
