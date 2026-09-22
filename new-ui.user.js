@@ -4579,15 +4579,14 @@ body.${BODY_CLASS} #WorkcenterDetail--Order_Status_Flexbox .sapMBtn {
 /* aby nadvihnutie pri prechode mysou neprislo o svoj vyraznejsi tien */
 body.${BODY_CLASS} #WorkcenterDetail--Order_Status_Flexbox .sapMBtn:hover {
   box-shadow:0 10px 20px rgba(16,36,63,.30) !important; }
-/* ten isty ram a tien aj na VYKRES a Components/BOM - pri BOM ide o vnutorny
-   obal (.sapMBtnInner), lebo ram kresli on, nie samotne tlacidlo */
-body.${BODY_CLASS} #__pda_order_drawing_button__,
-body.${BODY_CLASS} #WorkcenterDetail--BoM_Button-inner {
-  border-color:#7ba4ee !important;
-  box-shadow:0 3px 10px rgba(16,36,63,.12) !important; }
-body.${BODY_CLASS} #__pda_order_drawing_button__:hover,
+/* VYKRES a Components/BOM: modry ram AZ pri prechode mysou, bez tienu.
+   Pri BOM ide o vnutorny obal (.sapMBtnInner), lebo ram kresli on.
+   VYKRES musi ist cez obal (#...wrapper__ > button), nie cez vlastne ID:
+   nizsie v tomto subore mu ram nastavuje presne taky selektor, a ten ma
+   vyssiu specificitu (ID + 2 typy) nez samotne ID tlacidla. */
+body.${BODY_CLASS} #__pda_order_drawing_wrapper__ > button:hover,
 body.${BODY_CLASS} #WorkcenterDetail--BoM_Button-inner:hover {
-  box-shadow:0 10px 20px rgba(16,36,63,.30) !important; }
+  border-color:#7ba4ee !important; }
 
 /* ---------- nadpisy sekcii ---------- */
 .nd-nadpis { font:800 12px/1.3 -apple-system,"Segoe UI",Roboto,sans-serif; letter-spacing:.14em;
