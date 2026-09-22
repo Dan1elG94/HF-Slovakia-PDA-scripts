@@ -3672,9 +3672,23 @@ ${DIALOG_SEL} .pda-col-material { min-width:330px !important; }
 /* bezici cinnost vpravo (Vyroba - Vyroba / meno / cas / Zastavit) ako jemna pilulka */
 .pda-aktivita { border-radius:14px !important; background:#e9f6ed !important;
   border:1px solid #bfe3ca !important; box-shadow:0 2px 8px rgba(16,36,63,.10) !important;
-  padding:12px 14px !important; margin:8px 0 !important; box-sizing:border-box; }
-.pda-aktivita .sapMBtn { border-radius:999px !important; box-shadow:0 2px 6px rgba(16,36,63,.16) !important; }
-.pda-aktivita .sapMBtn .sapMBtnInner { border-radius:999px !important; padding:6px 16px !important; }
+  padding:8px 12px !important; margin:0 !important; box-sizing:border-box; }
+/*
+ * Zastavit: tien aj pozadie musia byt na TOM ISTOM prvku. Predtym bol tien
+ * na <button> a farebna plocha az na jeho vnutri (.sapMBtnInner), takze tien
+ * obkresloval ine miesto nez viditelna pilulka a pri bielom pozadi to bilo
+ * do oci. Teraz je oboje na .sapMBtnInner a tien je zladeny s cervenou.
+ * Cervena #e53935 je rovnaka, aka sa pouziva inde v skripte.
+ */
+.pda-aktivita .sapMBtn { border-radius:999px !important; box-shadow:none !important;
+  margin:0 !important; }
+.pda-aktivita .sapMBtn .sapMBtnInner { border-radius:999px !important; padding:7px 18px !important;
+  background:#e53935 !important; background-image:none !important;
+  border:1px solid #e53935 !important;
+  box-shadow:0 2px 6px rgba(229,57,53,.35) !important; }
+.pda-aktivita .sapMBtn .sapMBtnContent,
+.pda-aktivita .sapMBtn bdi,
+.pda-aktivita .sapMBtn .sapUiIcon { color:#fff !important; }
 
 /* Operation Complete: na jeden riadok, nizsie a sirsie */
 #${CONFIRM_ID} { height:auto !important; min-height:0 !important; max-height:none !important;
@@ -4809,10 +4823,19 @@ body.${BODY_CLASS} #WorkcenterDetail--OrderStatus_List-listUl { padding:12px !im
    namiesto dvoch (predtym VBox: hore nazov+meno, dole cas+tlacidlo) */
 body.${BODY_CLASS} #WorkcenterDetail--OrderStatus_List-listUl .sapMFlexBoxFit.sapMVBox {
   flex-direction:row !important; justify-content:space-between !important; align-items:center !important; }
+/* stav a meno operatora vedla seba v jednom riadku (UI5 ich dava ako VBox
+   pod seba) a zvisle na stred zelenej pilulky */
 body.${BODY_CLASS} #WorkcenterDetail--OrderStatus_List-listUl [id^="WorkcenterDetail--Title_FlexBox-"] {
-  flex:1 1 auto !important; min-width:0 !important; }
+  flex:1 1 auto !important; min-width:0 !important;
+  flex-direction:row !important; align-items:center !important;
+  justify-content:flex-start !important; gap:14px !important; margin:0 !important; }
+/* UI5 rozdava vlastne triedy sapUiTinyMargin* - v jednoriadkovom rozlozeni
+   uz len rozhadzuju zvisle centrovanie, takze ich tu nulujeme */
+body.${BODY_CLASS} #WorkcenterDetail--OrderStatus_List-listUl [id^="WorkcenterDetail--Title_FlexBox-"] > .sapMLabel,
+body.${BODY_CLASS} #WorkcenterDetail--OrderStatus_List-listUl [id^="WorkcenterDetail--Timer_Label-"] {
+  margin:0 !important; line-height:1.2 !important; }
 body.${BODY_CLASS} #WorkcenterDetail--OrderStatus_List-listUl [id^="WorkcenterDetail--Timer_FlexBox-"] {
-  flex:0 0 auto !important; margin-left:12px !important; }
+  flex:0 0 auto !important; margin-left:12px !important; gap:12px !important; }
 
 /* ---------- SAP casy: ploche kolace s percentom v strede a legendou ---------- */
 body.${BODY_CLASS} .pda-3d { transform:none !important; margin-top:6px !important;
