@@ -2476,18 +2476,18 @@ body.${BODY_CLASS} #${PANEL_ID} .sapMPanelContent > :not(#${OVERVIEW_ID}) { disp
 /* zaoblene hrany hore aj dole - vidno, kde posuvny zoznam konci */
 #${SCROLL_ID} { border:0 !important; background:transparent !important; border-radius:14px !important; }
 #${LIST_ID} { background:transparent !important; }
-/* Zaznam je plochy riadok cez celu sirku zoznamu, oddeleny len tenkou linkou -
-   uz nie samostatna karta s ramom a striedavym podfarbenim. Text je v troch
-   riadkoch: vyrobna zakazka (tucne), zakaznicka zakazka, material. */
+/* Zaznam je samostatna pilulka s jemnym modrastym pozadim a malym radiusom,
+   bez ramu a bez deliacich liniek - od seba ich oddeluje len medzera. Text je
+   v troch riadkoch: vyrobna zakazka (tucne), zakaznicka zakazka, material. */
 #${LIST_ID} .sapMLIB.pda-pill-on { min-height:0 !important; height:auto !important; padding:0 !important;
-  margin:0 !important; border:0 !important; border-bottom:1px solid #e6ecf5 !important;
-  border-radius:0 !important; background:transparent !important; overflow:hidden;
-  transition:background-color .12s; width:100% !important; max-width:100% !important; }
-#${LIST_ID} .sapMLIB.pda-pill-on:last-child { border-bottom:0 !important; }
-#${LIST_ID} .sapMLIB.pda-pill-on:hover { background:#eef3fa !important; }
-/* vybrana zakazka: plna modra na bielo */
-#${LIST_ID} .sapMLIB.pda-pill-on.sapMLIBSelected { background:#0b63ce !important;
-  border-bottom-color:#0b63ce !important; }
+  margin:5px 3px !important; border:0 !important; border-radius:10px !important;
+  background:#eef2f9 !important; overflow:hidden;
+  transition:background-color .12s; width:auto !important; max-width:100% !important; }
+#${LIST_ID} .sapMLIB.pda-pill-on:hover { background:#e2eaf6 !important; }
+/* Vybrana zakazka: modra, ale zamerne stlmena (menej sytosti nez cista
+   "linkova" modra) - v zozname ma byt zretelna, nie krikliva. */
+#${LIST_ID} .sapMLIB.pda-pill-on.sapMLIBSelected { background:#2f5fa8 !important; }
+#${LIST_ID} .sapMLIB.pda-pill-on.sapMLIBSelected:hover { background:#3568b6 !important; }
 #${LIST_ID} .sapMLIB.pda-pill-on.sapMLIBSelected .pda-pill,
 #${LIST_ID} .sapMLIB.pda-pill-on.sapMLIBSelected .t-vyr,
 #${LIST_ID} .sapMLIB.pda-pill-on.sapMLIBSelected .t-zak,
