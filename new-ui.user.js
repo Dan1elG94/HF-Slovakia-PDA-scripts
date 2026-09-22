@@ -3620,11 +3620,12 @@ ${DIALOG_SEL} .pda-col-material { min-width:330px !important; }
             const st = document.createElement('style');
             st.id = STYLE_ID;
             st.textContent = `
-/* box so zakazkou: SAP mu kresli vlastny ram zlava - nepotrebujeme ho */
-#${ORDER_ID} { border-left:0 !important; }
+/* box so zakazkou: SAP mu kresli vlastny ram zlava - nepotrebujeme ho.
+   Vnutorne odsadenie drzi obsah dalej od okrajov karty. */
+#${ORDER_ID} { border-left:0 !important; padding:10px 14px !important; }
 
 /* cely riadok hlavicky: prepinac, vykres a tlacidlo vedla seba, zvisle na stred */
-#${HEADER_ID} { align-items:center !important; gap:12px !important; padding:4px 8px 2px !important; }
+#${HEADER_ID} { align-items:center !important; gap:12px !important; padding:0 !important; }
 
 /* formular (zakazka / material / production order) ako kompaktny box */
 #${HEADER_ID} .sapUiForm { background:#f7f9fd !important; border:1px solid #e3e9f1 !important;
@@ -3661,10 +3662,10 @@ ${DIALOG_SEL} .pda-col-material { min-width:330px !important; }
 
 /* Stavove tlacidla su hore nad boxom so zakazkou a sedia vo vlastnom farebnom
    banery. Zarovnanie s boxom ide cez margin-left a max-width (inline styl),
-   takze vnutorne odsadenie tu uz pokojne byt moze. */
+   vnutorne odsadenie ziadne - riadi si ho obsah sam. */
 #${STATUS_ID} { background:linear-gradient(180deg,#eef3fa 0%,#dde7f4 100%) !important;
   border:1px solid #c9d7ea !important; border-radius:14px !important;
-  padding:8px 10px !important;
+  padding:0 !important;
   box-shadow:0 2px 8px rgba(16,36,63,.10) !important; margin-bottom:10px !important;
   box-sizing:border-box !important; }
 
@@ -4569,8 +4570,8 @@ body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox { flex-wrap:wrap !impo
 
 /* ---------- pravy stlpec appky ---------- */
 body.${BODY_CLASS} #WorkcenterDetail--Order_Status_Flexbox {
-  background:transparent !important; border:0 !important; box-shadow:none !important;
-  padding-top:2px !important; }
+  background:#fff !important; border:0 !important; box-shadow:none !important;
+  padding:0 !important; }
 
 /* ---------- patka ---------- */
 #${FOOTER_ID} { position:fixed; left:0; right:0; bottom:0; height:34px; z-index:4;
