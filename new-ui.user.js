@@ -4579,13 +4579,13 @@ body.${BODY_CLASS} #WorkcenterDetail--Order_Status_Flexbox .sapMBtn {
 /* aby nadvihnutie pri prechode mysou neprislo o svoj vyraznejsi tien */
 body.${BODY_CLASS} #WorkcenterDetail--Order_Status_Flexbox .sapMBtn:hover {
   box-shadow:0 10px 20px rgba(16,36,63,.30) !important; }
-/* VYKRES a Components/BOM: modry ram AZ pri prechode mysou, bez tienu.
-   Pri BOM ide o vnutorny obal (.sapMBtnInner), lebo ram kresli on.
-   VYKRES musi ist cez obal (#...wrapper__ > button), nie cez vlastne ID:
-   nizsie v tomto subore mu ram nastavuje presne taky selektor, a ten ma
-   vyssiu specificitu (ID + 2 typy) nez samotne ID tlacidla. */
-body.${BODY_CLASS} #__pda_order_drawing_wrapper__ > button:hover,
-body.${BODY_CLASS} #WorkcenterDetail--BoM_Button-inner:hover {
+/* VYKRES: modry ram AZ pri prechode mysou, bez tienu. Musi ist cez obal
+   (#...wrapper__ > button), nie cez vlastne ID tlacidla: nizsie v tomto
+   subore mu ram nastavuje presne taky selektor a ten ma vyssiu specificitu
+   (ID + 2 typy) nez samotne ID tlacidla.
+   Hover pre BOM je pri jeho ostatnych pravidlach nizsie - tam musi prebit
+   ram, ktory si sam nastavuje .sapMBtnInner. */
+body.${BODY_CLASS} #__pda_order_drawing_wrapper__ > button:hover {
   border-color:#7ba4ee !important; }
 
 /* ---------- nadpisy sekcii ---------- */
@@ -4721,6 +4721,10 @@ body.${BODY_CLASS} #__pda_detail_rightcol__ .nd-bom,
 body.${BODY_CLASS} #__pda_detail_rightcol__ #WorkcenterDetail--BoM_Button {
   align-self:stretch !important; flex:0 0 220px !important;
   width:220px !important; min-width:0 !important;
+  /* height:auto je tu nutnost, nie ozdoba: UI5 pise tlacidlu vysku priamo
+     do inline stylu a align-self:stretch sa uplatni LEN vtedy, ked je
+     vyska auto. S pevnou vyskou sa natiahnutie ticho ignoruje. */
+  height:auto !important;
   padding:0 !important; box-sizing:border-box !important; }
 /* Ram, tien a pozadie kresli vnutorny .sapMBtnInner, nie samotne tlacidlo -
    preto musi vyplnit cele tlacidlo, inak by ramcek obopinal len text. */
@@ -4729,6 +4733,13 @@ body.${BODY_CLASS} #WorkcenterDetail--BoM_Button .sapMBtnInner { background:#fff
   padding:0 !important; box-shadow:0 2px 8px rgba(16,36,63,.08) !important; color:#13315c !important; font-weight:700 !important;
   height:100% !important; width:100% !important; box-sizing:border-box !important;
   display:flex !important; align-items:center !important; justify-content:center !important; }
+/* Hover BOM: ram si nastavuje .sapMBtnInner hore skratkou "border", a ten
+   zapis ma rovnaku specificitu ako povodne hover pravidlo vyssie v subore -
+   pri zhode vyhrava neskorsi, takze hover prestal fungovat. Tu je preto
+   silnejsi selektor (dve ID) a stoji az za nim. */
+body.${BODY_CLASS} #__pda_detail_rightcol__ #WorkcenterDetail--BoM_Button:hover .sapMBtnInner,
+body.${BODY_CLASS} #__pda_detail_rightcol__ .nd-bom:hover .sapMBtnInner {
+  border-color:#7ba4ee !important; }
 body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button .sapMBtnInner { background:linear-gradient(180deg,#2b7fe0,#1a5fc4) !important;
   border:0 !important; border-radius:12px !important; padding:10px 22px !important;
   box-shadow:0 6px 16px rgba(26,95,196,.35) !important; }
