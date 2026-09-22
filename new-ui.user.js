@@ -4553,9 +4553,14 @@ body.${BODY_CLASS} .sapMPanelHdr .sapMTitle, body.${BODY_CLASS} .sapMPanelHdr .s
    su preto len pseudo-prvky ::before / ::after na obale .sapMBtnInner a text
    beru z data-* atributov, ktore na obal doplna JS. Skutocny text tlacidla
    zostava netknuty v .sapMBtnContent. */
+/* Vysku tlacidla urcuje VYLUCNE tato jedna hodnota. Inline height, ktory na
+   tlacidlo (a na .sapMBtnInner) pise SAP, je bez !important, takze ho toto
+   pravidlo prebija - v DevTools ho vidno, ale neuplatnuje sa. Vnutorny
+   padding do vysky nezasahuje, kym je tu pevna hodnota; .sapMBtnInner ma
+   height:100%, takze len vyplni tlacidlo. */
 body.${BODY_CLASS} .statusBtn { border-radius:16px !important; border:1px solid #b9cdee !important;
   background-color:#0d4a8f !important; box-shadow:0 6px 16px rgba(16,36,63,.18) !important;
-  min-width:190px !important; height:96px !important; box-sizing:border-box !important; }
+  min-width:190px !important; height:64px !important; box-sizing:border-box !important; }
 body.${BODY_CLASS} .statusBtn .sapMBtnInner { padding:12px 18px !important; border-radius:16px !important;
   display:flex !important; align-items:center !important; justify-content:center !important;
   height:100% !important; width:100% !important; box-sizing:border-box !important;
@@ -4564,6 +4569,16 @@ body.${BODY_CLASS} .statusBtn .sapMBtnContent { justify-content:center !importan
   font-size:15px !important; font-weight:800 !important; line-height:1.2 !important;
   white-space:nowrap !important; color:#fff !important; }
 body.${BODY_CLASS} .statusBtn .sapMBtnContent, body.${BODY_CLASS} .statusBtn bdi { color:#fff !important; }
+/* Vsetky tlacidla v boxe so stavmi maju rovnaky jemny ram a tien (ten isty
+   zapis ako hover tlacidiel v hornom pruhu). Ide to na samotny <button> -
+   na .sapMBtnInner pise farbu ramu inline s !important funkcia paint(),
+   co by sa zo stylesheetu uz prebit nedalo. */
+body.${BODY_CLASS} #WorkcenterDetail--Order_Status_Flexbox .sapMBtn {
+  border-color:#7ba4ee !important;
+  box-shadow:0 3px 10px rgba(16,36,63,.12) !important; }
+/* aby nadvihnutie pri prechode mysou neprislo o svoj vyraznejsi tien */
+body.${BODY_CLASS} #WorkcenterDetail--Order_Status_Flexbox .sapMBtn:hover {
+  box-shadow:0 10px 20px rgba(16,36,63,.30) !important; }
 
 /* ---------- nadpisy sekcii ---------- */
 .nd-nadpis { font:800 12px/1.3 -apple-system,"Segoe UI",Roboto,sans-serif; letter-spacing:.14em;
