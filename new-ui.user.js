@@ -4711,8 +4711,19 @@ body.${BODY_CLASS} #__pda_detail_rightcol__ .pda-machine::before { content:'Stro
 body.${BODY_CLASS} #__pda_detail_rightcol__ #WorkcenterDetail--Confirm_Button { order:3; }
 body.${BODY_CLASS} #__pda_order_drawing_wrapper__ > button { border:1px solid #dfe7f2 !important; border-radius:12px !important;
   padding:8px 14px !important; box-shadow:0 2px 8px rgba(16,36,63,.08) !important; }
+/* Components/BOM: rovnako vysoke ako VYKRES. Nedavame pevnu vysku - v riadku
+   sa len natiahne (align-self:stretch) na vysku najvyssieho prvku, a to je
+   prave tlacidlo VYKRES (trojriadkove). Ak sa VYKRES zmeni, BOM ide s nim. */
+body.${BODY_CLASS} #__pda_detail_rightcol__ .nd-bom {
+  align-self:stretch !important; flex:0 0 220px !important;
+  width:220px !important; min-width:0 !important;
+  padding:0 !important; box-sizing:border-box !important; }
+/* Ram, tien a pozadie kresli vnutorny .sapMBtnInner, nie samotne tlacidlo -
+   preto musi vyplnit cele tlacidlo, inak by ramcek obopinal len text. */
 body.${BODY_CLASS} .nd-bom .sapMBtnInner { background:#fff !important; border:1px solid #dfe7f2 !important; border-radius:12px !important;
-  padding:9px 14px !important; box-shadow:0 2px 8px rgba(16,36,63,.08) !important; color:#13315c !important; font-weight:700 !important; }
+  padding:0 !important; box-shadow:0 2px 8px rgba(16,36,63,.08) !important; color:#13315c !important; font-weight:700 !important;
+  height:100% !important; width:100% !important; box-sizing:border-box !important;
+  display:flex !important; align-items:center !important; justify-content:center !important; }
 body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button .sapMBtnInner { background:linear-gradient(180deg,#2b7fe0,#1a5fc4) !important;
   border:0 !important; border-radius:12px !important; padding:10px 22px !important;
   box-shadow:0 6px 16px rgba(26,95,196,.35) !important; }
