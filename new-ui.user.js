@@ -4519,7 +4519,7 @@ body.${BODY_CLASS}, body.${BODY_CLASS} #Application { background:url(${POZADIE})
 body.${BODY_CLASS} .sapUiBody, body.${BODY_CLASS} .sapMShell, body.${BODY_CLASS} .sapMPage,
 body.${BODY_CLASS} .sapMPageBgStandard, body.${BODY_CLASS} .sapMPageBgSolid,
 body.${BODY_CLASS} .sapMNav, body.${BODY_CLASS} .sapMApp { background:transparent !important; }
-body.${BODY_CLASS} .sapMPanel { background:#fff !important; border:1px solid #e3ebf5 !important;
+body.${BODY_CLASS} .sapMPanel { background:rgba(255,255,255,.8) !important; border:1px solid #e3ebf5 !important;
   border-radius:18px !important; box-shadow:0 4px 18px rgba(16,36,63,.08) !important;
   margin:10px 12px !important; box-sizing:border-box !important;
   /* SAP dava panelu fixnu sirku (px, vypocitanu este pred nasim marginom),
@@ -4626,6 +4626,15 @@ header.sapMPageHeader + section {
 #__pda_search_sidebar__ {
     margin: 12px !important;
     border-radius: 18px !important;
+    /* rovnaky vypocet ako pri .sapMPanel - sirku si tento kontajner nastavuje
+       inline na 100%, takze bez !important by sa nas prepocet neuplatnil a
+       panel by aj s marginmi vytekal vpravo mimo rodica */
+    width: calc(100% - 24px) !important;
+    max-width: calc(100% - 24px) !important;
+    box-sizing: border-box !important;
+    /* mierne priehladne, aby bolo cez kartu jemne vidiet pozadie
+       (inline background-color prebijeme cez !important) */
+    background-color: rgba(255,255,255,.8) !important;
 }
 #__pda_custom_search_ui__ {
     padding: 16px !important;
