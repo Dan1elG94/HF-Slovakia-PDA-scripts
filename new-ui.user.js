@@ -3622,7 +3622,7 @@ ${DIALOG_SEL} .pda-col-material { min-width:330px !important; }
             st.textContent = `
 /* box so zakazkou: SAP mu kresli vlastny ram zlava - nepotrebujeme ho.
    Vnutorne odsadenie drzi obsah dalej od okrajov karty. */
-#${ORDER_ID} { border-left:0 !important; padding:10px 14px !important; }
+#${ORDER_ID} { border-left:0 !important; padding:0 14px !important; }
 
 /* cely riadok hlavicky: prepinac, vykres a tlacidlo vedla seba, zvisle na stred */
 #${HEADER_ID} { align-items:center !important; gap:12px !important; padding:0 !important; }
@@ -4578,6 +4578,15 @@ body.${BODY_CLASS} #WorkcenterDetail--Order_Status_Flexbox .sapMBtn {
   box-shadow:0 3px 10px rgba(16,36,63,.12) !important; }
 /* aby nadvihnutie pri prechode mysou neprislo o svoj vyraznejsi tien */
 body.${BODY_CLASS} #WorkcenterDetail--Order_Status_Flexbox .sapMBtn:hover {
+  box-shadow:0 10px 20px rgba(16,36,63,.30) !important; }
+/* ten isty ram a tien aj na VYKRES a Components/BOM - pri BOM ide o vnutorny
+   obal (.sapMBtnInner), lebo ram kresli on, nie samotne tlacidlo */
+body.${BODY_CLASS} #__pda_order_drawing_button__,
+body.${BODY_CLASS} #WorkcenterDetail--BoM_Button-inner {
+  border-color:#7ba4ee !important;
+  box-shadow:0 3px 10px rgba(16,36,63,.12) !important; }
+body.${BODY_CLASS} #__pda_order_drawing_button__:hover,
+body.${BODY_CLASS} #WorkcenterDetail--BoM_Button-inner:hover {
   box-shadow:0 10px 20px rgba(16,36,63,.30) !important; }
 
 /* ---------- nadpisy sekcii ---------- */
