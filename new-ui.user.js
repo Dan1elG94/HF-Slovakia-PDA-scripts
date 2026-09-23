@@ -4983,6 +4983,39 @@ body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox .nd-pct { transform:tr
 body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox .nd-pct .c { font-size:16px !important; }
 body.${BODY_CLASS} #WorkcenterDetail--TimerCharts_FlexBox .nd-pct .h { display:none !important; }
 
+/* ---------- karta "Prehľad zdrojov" v lavom stlpci ----------
+   V boxe ostavaju len dve tlacidla. Nadpis "Resource over time", maly graf aj
+   riadok s prazdnymi placeholdermi skryvame - graf sa aj tak otvara az v
+   dialogu cez tlacidlo s lupou. Tlacidla su v appke bez textu (len ikona),
+   popisky preto doplname cez ::after. */
+body.${BODY_CLASS} #__pda_left_box_graf__ #WorkcenterDetail--WorkplaceDetailsButtons_FlexBox,
+body.${BODY_CLASS} #__pda_left_box_graf__ #WorkcenterDetail--Over_Title_Title,
+body.${BODY_CLASS} #__pda_left_box_graf__ #WorkcenterDetail--ChartFlexBox { display:none !important; }
+body.${BODY_CLASS} #__pda_left_box_graf__ #WorkcenterDetail--Over_Time_FlexBox,
+body.${BODY_CLASS} #__pda_left_box_graf__ #WorkcenterDetail--Over_Time_Header {
+  width:100% !important; height:auto !important; margin:0 !important; padding:0 !important; }
+/* riadok s tlacidlami: dve rovnake polovice cez celu sirku */
+body.${BODY_CLASS} #__pda_left_box_graf__ #WorkcenterDetail--Buttons_FlexBox {
+  width:100% !important; height:auto !important; margin:0 !important;
+  justify-content:stretch !important; gap:10px !important; }
+body.${BODY_CLASS} #__pda_left_box_graf__ #WorkcenterDetail--Buttons_FlexBox > .sapMBtn {
+  flex:1 1 0 !important; width:auto !important; min-width:0 !important;
+  height:auto !important; margin:0 !important; }
+body.${BODY_CLASS} #__pda_left_box_graf__ #WorkcenterDetail--Buttons_FlexBox .sapMBtnInner {
+  display:flex !important; align-items:center !important; justify-content:center !important;
+  gap:8px !important; width:100% !important; height:auto !important;
+  padding:11px 12px !important; box-sizing:border-box !important;
+  background:#fff !important; background-image:none !important;
+  border:1px solid #dfe7f2 !important; border-radius:12px !important;
+  box-shadow:0 2px 8px rgba(16,36,63,.08) !important;
+  font-size:13px !important; font-weight:700 !important; color:#13315c !important; }
+body.${BODY_CLASS} #__pda_left_box_graf__ #WorkcenterDetail--Buttons_FlexBox .sapMBtn:hover .sapMBtnInner {
+  border-color:#7ba4ee !important; background:#f6f9ff !important; }
+body.${BODY_CLASS} #__pda_left_box_graf__ #WorkcenterDetail--Buttons_FlexBox .sapUiIcon {
+  color:#13315c !important; font-size:16px !important; margin:0 !important; }
+body.${BODY_CLASS} #WorkcenterDetail--Chart_Button .sapMBtnInner::after { content:'Graf'; }
+body.${BODY_CLASS} #WorkcenterDetail--Status_Overview_Button .sapMBtnInner::after { content:'Tabuľka'; }
+
 /* ---------- POPIS OPERACIE ako karta s "Cely text" ---------- */
 body.${BODY_CLASS} #__pda_opis_button__ { display:grid !important; grid-template-columns:1fr auto !important;
   grid-template-rows:auto auto !important; column-gap:12px !important; row-gap:6px !important;
@@ -5390,6 +5423,7 @@ body.${BODY_CLASS} #__pda_hf_menu__ .hf-btn .n { font-size:14px !important; }
             nadpisDo(document.getElementById('WorkcenterDetail--Main_SimpleForm--Form'), 'Zákazka a materiál', 'zakazka');
             nadpisDo(document.getElementById('WorkcenterDetail--TimerCharts_FlexBox'), 'SAP časy', 'casy');
             nadpisDo(document.getElementById('__pda_detail_rightcol__'), 'Dokumentácia', 'dokumentacia');
+            nadpisDo(document.getElementById('__pda_left_box_graf__'), 'Prehľad zdrojov', 'zdroje');
 
             // kazda cast zvlast v try/catch - chyba v jednej nesmie zhodit ostatne
             [usporiadajDetailMriezku, riadokAkcii, kartaZakazky, percentaKolacov, popisKarta, prekladHlavicky,
