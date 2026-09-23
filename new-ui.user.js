@@ -2452,7 +2452,7 @@ body.${BODY_CLASS} #${PANEL_ID} .sapMPanelContent > :not(#${OVERVIEW_ID}) { disp
         const TIP_ID = '__pda_pill_tip__';
         const BOX1_ID = '__pda_left_box_zoznam__';
         const BOX2_ID = '__pda_left_box_graf__';
-        const VYSKA_ZOZNAMU = 520;    // pevna vyska posuvneho zoznamu zakaziek (px)
+        const VYSKA_ZOZNAMU = 460;    // pevna vyska posuvneho zoznamu zakaziek (px)
 
         let poslednyPodpis = '';
         let poslednyResize = 0;
