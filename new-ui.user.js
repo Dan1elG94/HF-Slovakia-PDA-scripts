@@ -4594,9 +4594,17 @@ body.${BODY_CLASS} .statusBtn .sapMBtnContent, body.${BODY_CLASS} .statusBtn bdi
    zarovnavaju na uctovnu ciaru, nie na stred. Modra je tá ista, aku ma nase
    tlacidlo "Hladat" vo vyhladavacom okne (#13315c / hover #1c478a), aby
    sedelo k ostatnym neutralnym tlacidlam appky. */
+/* Lista, v ktorej tlacidlo sedi, ma pevnu vysku 4rem (64px) a tlacidlo z nej
+   vytekalo - trieda sapUiSmallMargin mu dava 1rem margin hore aj dole, takze
+   na samotne tlacidlo zostavalo len 32px. Zvisle marginy rusime (bocny
+   odstup od okraja listy ostava), tlacidlo centrujeme a mierne znizujeme,
+   nech sa do listy zmesti cele. */
+body.${BODY_CLASS} #Main--Button_SearchProductionOrder {
+  margin-top:0 !important; margin-bottom:0 !important;
+  align-self:center !important; height:auto !important; }
 body.${BODY_CLASS} #Main--Button_SearchProductionOrder .sapMBtnInner {
   display:flex !important; align-items:center !important; justify-content:center !important;
-  height:auto !important; padding:9px 18px !important; box-sizing:border-box !important;
+  height:auto !important; padding:8px 16px !important; box-sizing:border-box !important;
   background:#13315c !important; background-image:none !important;
   border:1px solid #13315c !important; border-radius:10px !important; }
 body.${BODY_CLASS} #Main--Button_SearchProductionOrder:hover .sapMBtnInner {
