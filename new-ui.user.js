@@ -2471,7 +2471,8 @@ body.${BODY_CLASS} #${PANEL_ID} .sapMPanelContent > :not(#${OVERVIEW_ID}) { disp
   padding:0 !important; box-sizing:border-box;
   width:430px !important; max-width:430px !important; min-width:0 !important; flex:0 0 430px !important; }
 .pda-left-box { background:#fff; border:1px solid #dfe4ec; border-radius:14px; padding:8px;
-  margin-bottom:10px; box-sizing:border-box; box-shadow:0 1px 4px rgba(16,36,63,.06); }
+  margin-bottom:10px; box-sizing:border-box; box-shadow:0 1px 4px rgba(16,36,63,.06);
+  width:100% !important; max-width:100% !important; align-self:stretch !important; }
 .pda-left-box:last-child { margin-bottom:0; }
 /* zaoblene hrany hore aj dole - vidno, kde posuvny zoznam konci */
 #${SCROLL_ID} { border:0 !important; background:transparent !important; border-radius:14px !important; }
@@ -5004,7 +5005,7 @@ body.${BODY_CLASS} #__pda_left_box_graf__ #WorkcenterDetail--Buttons_FlexBox > .
 body.${BODY_CLASS} #__pda_left_box_graf__ #WorkcenterDetail--Buttons_FlexBox .sapMBtnInner {
   display:flex !important; align-items:center !important; justify-content:center !important;
   gap:8px !important; width:100% !important; height:auto !important;
-  padding:11px 12px !important; box-sizing:border-box !important;
+  padding:0 12px !important; box-sizing:border-box !important; line-height:26px !important;
   background:#fff !important; background-image:none !important;
   border:1px solid #dfe7f2 !important; border-radius:12px !important;
   box-shadow:0 2px 8px rgba(16,36,63,.08) !important;
