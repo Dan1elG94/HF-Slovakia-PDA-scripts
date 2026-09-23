@@ -3613,7 +3613,19 @@ ${DIALOG_SEL} .pda-col-material { min-width:330px !important; }
 #${ORDER_ID} { border-left:0 !important; padding:0 14px !important; }
 
 /* cely riadok hlavicky: prepinac, vykres a tlacidlo vedla seba, zvisle na stred */
-#${HEADER_ID} { align-items:center !important; gap:12px !important; padding:0 !important; }
+#${HEADER_ID} { align-items:center !important; gap:12px !important; padding:0 !important;
+  margin:0 !important; height:auto !important; min-height:0 !important; }
+/*
+ * Obal hlavicky drzal pod kartou "Dokumentácia" zhruba dvojnasobnu medzeru
+ * nez je medzi ostatnymi kartami. Su v nom totiz este tri zvysky po povodnom
+ * rozlozeni - prazdny FlexBox2, pruzna medzera ToolbarSpacer1 a uz prazdny
+ * Machine_FlexBox (prepinac stroja sme presunuli do #__pda_detail_machine__).
+ * Nic nezobrazuju, ale roztahuju vysku obalu, a ten rozdiel vyzeral ako
+ * vacsia medzera. Skryvame ich, takze obal uz presne obopina kartu.
+ */
+#WorkcenterDetail--FlexBox2,
+#${HEADER_ID} > #WorkcenterDetail--ToolbarSpacer1,
+#WorkcenterDetail--Machine_FlexBox:empty { display:none !important; }
 
 /* formular (zakazka / material / production order) ako kompaktny box */
 #${HEADER_ID} .sapUiForm { background:#f7f9fd !important; border:1px solid #e3e9f1 !important;
@@ -4730,9 +4742,11 @@ body.${BODY_CLASS} #__pda_detail_rightcol__ { flex:0 0 100% !important; width:10
   flex-direction:row !important; flex-wrap:wrap !important; align-items:center !important; gap:12px !important; margin:0 0 10px !important;
   padding:10px 14px !important; background:#fff; border:1px solid #e3ebf5; border-radius:16px;
   box-shadow:0 4px 14px rgba(16,36,63,.06); box-sizing:border-box; }
-/* vlastne marginy nadpisu by sa scitali s gap:12px riadku - medzeru necháme
-   na gap, nech je odstup od tlacidiel rovnaky ako medzi nimi */
-body.${BODY_CLASS} #__pda_detail_rightcol__ > [data-nd-nadpis] { margin:0 !important; }
+/* Zvisle marginy nadpisu by sa scitali s gap:12px riadku - tie nulujeme a
+   medzeru necháme na gap. Lavy margin 6px vsak ostava: rovnaky ma z
+   .nd-v-riadku aj "Stav operácie" a "SAP časy", takze vsetky nadpisy
+   zacinaju na tej istej zvislici. */
+body.${BODY_CLASS} #__pda_detail_rightcol__ > [data-nd-nadpis] { margin:0 0 0 6px !important; }
 body.${BODY_CLASS} #__pda_detail_rightcol__ .pda-machine { order:2; margin-left:auto !important; gap:8px !important; }
 body.${BODY_CLASS} #__pda_detail_rightcol__ .pda-machine .sapMLabel { display:none !important; }
 body.${BODY_CLASS} #__pda_detail_rightcol__ .pda-machine::before { content:'Stroj'; font:700 13px/1 -apple-system,"Segoe UI",Roboto,sans-serif;
@@ -4849,11 +4863,19 @@ body.${BODY_CLASS} #WorkcenterDetail--Order_Info_Buttons_FlexBox .sapMList { bac
 /* rovnaky nadpis ako .nd-nadpis ("SAP casy"). Dolezity je line-height:
    SAP dava hlavicke zoznamu vysoky pevny riadok (3rem), takze aj po
    height:auto ostal nadpis opticky zapichnuty v prazdnom pase. */
-body.${BODY_CLASS} #WorkcenterDetail--Order_Info_Buttons_FlexBox .sapMListHdrText { background:transparent !important;
-  border:0 !important; font-size:12px !important; font-weight:800 !important; letter-spacing:.14em !important;
-  line-height:1.3 !important; text-transform:uppercase !important; color:#4a6285 !important;
-  font-family:-apple-system,"Segoe UI",Roboto,sans-serif !important;
-  padding:12px 14px 8px !important; height:auto !important; min-height:0 !important; }
+/* Nadpis "Paralelné procesy" vychadzal tucnejsi a vacsi nez ostatne nadpisy.
+   Velkost a hrubku pisma mu nastavuje vlastne pravidlo SAP-u, ktore povodny
+   zapis (jedna trieda) neprebilo - presla len velkost pismen a prestrkanie,
+   ktore SAP nenastavuje. Preto sa cielime aj cez ID hlavicky (dve ID maju
+   navrch) a pismo zadavame skratkou "font", ktora naraz prepise rodinu,
+   velkost, hrubku aj vysku riadku - presne ako to ma .nd-nadpis.
+   Padding 18px zlava je zhodny s kartou "Popis operácie". */
+body.${BODY_CLASS} #WorkcenterDetail--Order_Info_Buttons_FlexBox #WorkcenterDetail--OrderStatus_List-header,
+body.${BODY_CLASS} #WorkcenterDetail--Order_Info_Buttons_FlexBox .sapMListHdrText {
+  font:800 12px/1.3 -apple-system,"Segoe UI",Roboto,sans-serif !important;
+  letter-spacing:.14em !important; text-transform:uppercase !important; color:#4a6285 !important;
+  background:transparent !important; border:0 !important;
+  padding:12px 18px 8px !important; height:auto !important; min-height:0 !important; }
 /* zoznam paralelnych procesov: odsadenie okolo poloziek */
 body.${BODY_CLASS} #WorkcenterDetail--OrderStatus_List-listUl { padding:12px !important; box-sizing:border-box !important; }
 /* jedna polozka zoznamu: meno vlavo, cas + Zastavit vpravo - jeden riadok
