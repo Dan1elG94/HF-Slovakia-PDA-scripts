@@ -4820,9 +4820,13 @@ body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm { background:#f
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm--Layout { display:none !important; }
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok {
   display:block !important; width:100% !important; margin:0 !important; line-height:1.5 !important; }
+/* font-size tu musi byt uvedena: prve tri riadky su zive SAP prvky s
+   vlastnou velkostou 14px, kym nase vlastne .k/.v ju nemaju a zdedili by
+   16px z karty - Mnozstvo a Pracovisko potom vychadzali vacsie */
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .sapMLabel,
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .k {
   display:inline !important; font-weight:700 !important; color:#4a6285 !important;
+  font-size:14px !important;
   max-width:none !important; width:auto !important; margin:0 !important; }
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok .sapMLabelColonAndRequired { display:none !important; }
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .sapMLabel::after,
@@ -4831,6 +4835,7 @@ body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .k
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .sapMText,
 body.${BODY_CLASS} #WorkcenterDetail--Main_SimpleForm .sapUiForm .nd-riadok > .v {
   display:inline !important; font-weight:400 !important; color:#13315c !important;
+  font-size:14px !important;
   max-width:none !important; margin-left:6px !important; }
 
 /* ---------- mriezka pod riadkom akcii: zakazka+material | SAP casy (hore),
@@ -4863,16 +4868,18 @@ body.${BODY_CLASS} #WorkcenterDetail--Order_Info_Buttons_FlexBox .sapMList { bac
 /* rovnaky nadpis ako .nd-nadpis ("SAP casy"). Dolezity je line-height:
    SAP dava hlavicke zoznamu vysoky pevny riadok (3rem), takze aj po
    height:auto ostal nadpis opticky zapichnuty v prazdnom pase. */
-/* Nadpis "Paralelné procesy" vychadzal tucnejsi a vacsi nez ostatne nadpisy.
-   Velkost a hrubku pisma mu nastavuje vlastne pravidlo SAP-u, ktore povodny
-   zapis (jedna trieda) neprebilo - presla len velkost pismen a prestrkanie,
-   ktore SAP nenastavuje. Preto sa cielime aj cez ID hlavicky (dve ID maju
-   navrch) a pismo zadavame skratkou "font", ktora naraz prepise rodinu,
-   velkost, hrubku aj vysku riadku - presne ako to ma .nd-nadpis.
-   Padding 18px zlava je zhodny s kartou "Popis operácie". */
+/*
+ * Nadpis "Paralelné procesy". ZAMERNE tu NEURCUJEME font-family (ani
+ * skratku "font", ktora by rodinu prepisala tiez): ked sme mu vnutili
+ * Segoe UI, vysiel vyrazne tucnejsi nez ostatne nadpisy. Segoe UI ma
+ * totiz skutocny rez 800, kym font appky ho nema a rovnakych 800 v nom
+ * prehliadac vykresli len ako bezny bold. Nadpisy tak pri rovnakom
+ * zapise vyzerali rozdielne. Rodinu preto dedi ako vsetko ostatne.
+ * Padding 18px zlava je zhodny s kartou "Popis operácie".
+ */
 body.${BODY_CLASS} #WorkcenterDetail--Order_Info_Buttons_FlexBox #WorkcenterDetail--OrderStatus_List-header,
 body.${BODY_CLASS} #WorkcenterDetail--Order_Info_Buttons_FlexBox .sapMListHdrText {
-  font:800 12px/1.3 -apple-system,"Segoe UI",Roboto,sans-serif !important;
+  font-size:12px !important; font-weight:800 !important; line-height:1.3 !important;
   letter-spacing:.14em !important; text-transform:uppercase !important; color:#4a6285 !important;
   background:transparent !important; border:0 !important;
   padding:12px 18px 8px !important; height:auto !important; min-height:0 !important; }
