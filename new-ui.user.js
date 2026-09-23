@@ -4547,6 +4547,7 @@ body.${BODY_CLASS} .sapMPanel { background:rgba(255,255,255,.8) !important; bord
 body.${BODY_CLASS} .sapMPanelWrappingDiv, body.${BODY_CLASS} .sapMPanelWrappingDivTb,
 body.${BODY_CLASS} .sapMPanelContent, body.${BODY_CLASS} .sapMPanelBGSolid {
   background:transparent !important; }
+body.${BODY_CLASS} #WorkcenterDetail--Tasks_Panel-content { padding-bottom:6px !important; }
 body.${BODY_CLASS} .sapMPanelHdr, body.${BODY_CLASS} .sapMPanelHeaderTB {
   background:transparent !important; border:0 !important; }
 body.${BODY_CLASS} .sapMPanelHdr .sapMTitle, body.${BODY_CLASS} .sapMPanelHdr .sapMText {
@@ -4575,6 +4576,22 @@ body.${BODY_CLASS} .statusBtn .sapMBtnContent { justify-content:center !importan
   font-size:15px !important; font-weight:800 !important; line-height:1.2 !important;
   white-space:nowrap !important; color:#fff !important; }
 body.${BODY_CLASS} .statusBtn .sapMBtnContent, body.${BODY_CLASS} .statusBtn bdi { color:#fff !important; }
+
+/* "Hladat vyrobny prikaz" v hornej liste. Text nesedel zvisle na strede -
+   ikona a text su dva inline prvky s roznou vyskou riadku a bez flexu sa
+   zarovnavaju na uctovnu ciaru, nie na stred. Modra je tá ista, aku ma nase
+   tlacidlo "Hladat" vo vyhladavacom okne (#13315c / hover #1c478a), aby
+   sedelo k ostatnym neutralnym tlacidlam appky. */
+body.${BODY_CLASS} #Main--Button_SearchProductionOrder .sapMBtnInner {
+  display:flex !important; align-items:center !important; justify-content:center !important;
+  height:auto !important; padding:9px 18px !important; box-sizing:border-box !important;
+  background:#13315c !important; background-image:none !important;
+  border:1px solid #13315c !important; border-radius:10px !important; }
+body.${BODY_CLASS} #Main--Button_SearchProductionOrder:hover .sapMBtnInner {
+  background:#1c478a !important; border-color:#1c478a !important; }
+body.${BODY_CLASS} #Main--Button_SearchProductionOrder .sapMBtnContent,
+body.${BODY_CLASS} #Main--Button_SearchProductionOrder bdi,
+body.${BODY_CLASS} #Main--Button_SearchProductionOrder .sapUiIcon { color:#fff !important; }
 /* Vsetky tlacidla v boxe so stavmi maju rovnaky jemny ram a tien (ten isty
    zapis ako hover tlacidiel v hornom pruhu). Ide to na samotny <button> -
    na .sapMBtnInner pise farbu ramu inline s !important funkcia paint(),
@@ -4592,7 +4609,7 @@ body.${BODY_CLASS} #WorkcenterDetail--Order_Status_Flexbox .sapMBtn:hover {
    Hover pre BOM je pri jeho ostatnych pravidlach nizsie - tam musi prebit
    ram, ktory si sam nastavuje .sapMBtnInner. */
 body.${BODY_CLASS} #__pda_order_drawing_wrapper__ > button:hover {
-  border-color:#7ba4ee !important; }
+  border-color:#7ba4ee !important; background:#f6f9ff !important; }
 
 /* ---------- nadpisy sekcii ---------- */
 .nd-nadpis { font:800 12px/1.3 -apple-system,"Segoe UI",Roboto,sans-serif; letter-spacing:.14em;
@@ -4706,10 +4723,16 @@ header.sapMPageHeader + section {
 }
 
 /* ---------- riadok akcii pod stavmi: Vykres | Components/BOM | Stroj ON/OFF | Operation Complete ---------- */
+/* flex-wrap je tu kvoli nadpisu "Dokumentácia": ma .nd-v-riadku s
+   flex-basis:100%, co ho posunie na vlastny riadok len vtedy, ked sa riadok
+   moze zalomit - inak by sa vsetko len stlacilo do jedneho riadku */
 body.${BODY_CLASS} #__pda_detail_rightcol__ { flex:0 0 100% !important; width:100% !important; max-width:none !important;
-  flex-direction:row !important; align-items:center !important; gap:12px !important; margin:0 0 10px !important;
+  flex-direction:row !important; flex-wrap:wrap !important; align-items:center !important; gap:12px !important; margin:0 0 10px !important;
   padding:10px 14px !important; background:#fff; border:1px solid #e3ebf5; border-radius:16px;
   box-shadow:0 4px 14px rgba(16,36,63,.06); box-sizing:border-box; }
+/* vlastne marginy nadpisu by sa scitali s gap:12px riadku - medzeru necháme
+   na gap, nech je odstup od tlacidiel rovnaky ako medzi nimi */
+body.${BODY_CLASS} #__pda_detail_rightcol__ > [data-nd-nadpis] { margin:0 !important; }
 body.${BODY_CLASS} #__pda_detail_rightcol__ .pda-machine { order:2; margin-left:auto !important; gap:8px !important; }
 body.${BODY_CLASS} #__pda_detail_rightcol__ .pda-machine .sapMLabel { display:none !important; }
 body.${BODY_CLASS} #__pda_detail_rightcol__ .pda-machine::before { content:'Stroj'; font:700 13px/1 -apple-system,"Segoe UI",Roboto,sans-serif;
@@ -4745,13 +4768,30 @@ body.${BODY_CLASS} #WorkcenterDetail--BoM_Button .sapMBtnInner { background:#fff
    silnejsi selektor (dve ID) a stoji az za nim. */
 body.${BODY_CLASS} #__pda_detail_rightcol__ #WorkcenterDetail--BoM_Button:hover .sapMBtnInner,
 body.${BODY_CLASS} #__pda_detail_rightcol__ .nd-bom:hover .sapMBtnInner {
-  border-color:#7ba4ee !important; }
-body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button .sapMBtnInner { background:linear-gradient(180deg,#2b7fe0,#1a5fc4) !important;
-  border:0 !important; border-radius:12px !important; padding:10px 22px !important;
-  box-shadow:0 6px 16px rgba(26,95,196,.35) !important; }
+  border-color:#7ba4ee !important; background:#f6f9ff !important; }
+/* Operation Complete: rovnaka vyska ako BOM - opat cez natiahnutie v riadku,
+   nie pevnou hodnotou. height:auto je nutne, inak UI5-acku inline vysku
+   align-self:stretch ticho ignoruje (to iste ako pri BOM). */
+body.${BODY_CLASS} #__pda_detail_rightcol__ #WorkcenterDetail--Confirm_Button {
+  align-self:stretch !important; height:auto !important; box-sizing:border-box !important; }
+/* Bledozelene pozadie s tmavozelenym textom; pri prechode mysou sa farby
+   vymenia. Zelene odtiene su tie, ktore uz v skripte su (tag "vyrába"). */
+body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button .sapMBtnInner { background:#e7f6ec !important;
+  background-image:none !important; border:1px solid #b6e2c5 !important; border-radius:12px !important;
+  padding:10px 22px !important; box-shadow:0 2px 8px rgba(29,122,60,.12) !important;
+  height:100% !important; box-sizing:border-box !important;
+  display:flex !important; align-items:center !important; justify-content:center !important;
+  transition:background-color .12s, color .12s !important; }
 body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button .sapMBtnContent,
-body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button bdi { color:#fff !important; font-weight:800 !important; font-size:14px !important; }
-body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button .sapMBtnInner::before { content:'✓'; color:#fff; font-weight:900; margin-right:8px; }
+body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button bdi { color:#1d7a3c !important; font-weight:800 !important; font-size:14px !important; }
+body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button .sapMBtnInner::before { content:'✓'; color:#1d7a3c; font-weight:900; margin-right:8px; }
+/* hover: prehodene - tmavozelene pozadie, bledozeleny text */
+body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button:hover .sapMBtnInner {
+  background:#1d7a3c !important; border-color:#1d7a3c !important;
+  box-shadow:0 4px 12px rgba(29,122,60,.30) !important; }
+body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button:hover .sapMBtnContent,
+body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button:hover bdi { color:#e7f6ec !important; }
+body.${BODY_CLASS} #WorkcenterDetail--Confirm_Button:hover .sapMBtnInner::before { color:#e7f6ec; }
 
 /* ---------- karta ZAKAZKA A MATERIAL: vsetkych 5 riadkov (3 zo SAP
    formulara + 2 vlastne) jednoducho "Popis: hodnota" v jednom riadku,
@@ -5238,6 +5278,7 @@ body.${BODY_CLASS} #__pda_hf_menu__ .hf-btn .n { font-size:14px !important; }
             }
             nadpisDo(document.getElementById('WorkcenterDetail--Main_SimpleForm--Form'), 'Zákazka a materiál', 'zakazka');
             nadpisDo(document.getElementById('WorkcenterDetail--TimerCharts_FlexBox'), 'SAP časy', 'casy');
+            nadpisDo(document.getElementById('__pda_detail_rightcol__'), 'Dokumentácia', 'dokumentacia');
 
             // kazda cast zvlast v try/catch - chyba v jednej nesmie zhodit ostatne
             [usporiadajDetailMriezku, riadokAkcii, kartaZakazky, percentaKolacov, popisKarta, prekladHlavicky,
