@@ -775,7 +775,6 @@
         const HOME_BUTTON_ID = 'Main--Button_HomeScreen';
         const PANEL_ID = 'Main--Workcenter_Panel';
         const PARENT_SECTION_ID = 'Main--MainPage-cont';
-        const TASKS_PANEL_ID = 'Main--Tasks_Panel';
         const SIDEBAR_ID = '__pda_search_sidebar__';
         const UI_ID = '__pda_custom_search_ui__';
         const TILE_ID_PREFIX = 'Main--Workcenter_Toolbar-';
@@ -1080,9 +1079,8 @@
             if (!document.getElementById(HOME_BUTTON_ID) || !document.getElementById(CONTENT_ID)) return;
 
             const parentSection = document.getElementById(PARENT_SECTION_ID);
-            const tasksPanel = document.getElementById(TASKS_PANEL_ID);
             const workcenterPanel = document.getElementById(PANEL_ID);
-            if (!parentSection || !tasksPanel || !workcenterPanel) return;
+            if (!parentSection || !workcenterPanel) return;
 
             let container = document.getElementById(SIDEBAR_ID);
             if (!container) {
